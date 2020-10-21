@@ -1,21 +1,32 @@
 package com.scnu.peexamsystem.dao.student;
 
 import com.scnu.peexamsystem.entity.Student;
-import jdk.nashorn.internal.runtime.Specialization;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Query;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Mapper
 @Repository
-public interface StudentDao extends JpaRepository<Student, String>, JpaSpecificationExecutor<Student> {
+public interface StudentDao {
 
-    List<Student> findByStuNo(String stuNo);
+    int existsByStuNoAndPassword(@Param("stuNo") String stuNo,
+                                 @Param("password") String password);
 
-    boolean existsByStuNoAndPassword(String stuNo, String password);
+    List<Student> findAllByCondition(@Param("stuName") String stuName,
+                                     @Param("instituteNo") String instituteNo,
+                                     @Param("classNo") String classNo,
+                                     @Param("grade") String grade,
+                                     @Param("status") String status);
 
-    List<Student> findAll(Specification<Student> specification);
+    int insertStudent(@Param("stuNo") String stuNo,
+                      @Param("password") String password);
+
+    int existStudent(@Param("stuNo") String stuNo);
+
+    int updateStudent(Student student);
+
+    Student findStudentByStuNo(@Param("stuNo") String stuNo);
+
 }

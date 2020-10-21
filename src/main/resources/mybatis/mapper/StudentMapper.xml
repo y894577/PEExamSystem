@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scnu.peexamsystem.dao.student.StudentDao">
+
+    <select id="findAllByCondition" resultType="Student">
+        select stu.stu_name as stuName, stu.stu_no as stuNo,
+        stu.verify_status as verifyStatus, stu.gender as gender,
+        cla.grade as grade, ins.institute_name as instituteName,
+        cla.class_name as className
+        from student as stu, institute as ins, class as cla
+        <where>
+            <if test="stuName != '' and stuName != null">
+                stu.stu_name like #{stuName}
+            </if>
+            <if test="instituteNo != '' and instituteNo != null">
+                and stu.institute_no = #{instituteNo}
+            </if>
+            <if test="classNo != '' and classNo != null">
+                and stu.class_no = #{classNo}
+            </if>
+            <if test="grade != '' and grade != null">
+                and cla.grade = #{grade}
+            </if>
+            <if test="status != '' and status != null">
+                and stu.verify_status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <select id="existsByStuNoAndPassword" resultType="int">
+        select count(*) as count from student
+        where stu_no = #{stuNo} and password = #{password};
+    </select>
+
+    <insert id="insertStudent">
+        insert into student (stuNo, password)
+        values (#{stuNo}, #{password});
+    </insert>
+
+    <select id="existStudent" resultType="int">
+        select count(*) as count where stu_no = #{stuNo};
+    </select>
+
+    <update id="updateStudent">
+        update student
+        <set>
+            <if test="stuName != ''">stu_name = #{stuName},</if>
+            <if test="gender ==0 || gender == 1">gender = #{gender},</if>
+            <if test="submitReason != ''">submit_reason = #{submitReason},</if>
+            <if test="medicalRecord != ''">medical_record = #{medicalRecord},</if>
+            <if test="instituteNo != ''">institute_no = #{instituteNo}</if>
+            <if test="class_no != ''">class_no = #{classNo}</if>
+        </set>
+        where stu_no = #{stuNo}
+    </update>
+
+    <select id="findStudentByStuNo">
+        select * from student where stu_no = #{stuNo}
+    </select>
+
+</mapper>
+
+
