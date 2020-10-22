@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.util.Map;
 
 
 @RestController
@@ -17,13 +18,19 @@ public class AdminController {
 
     @PostMapping("/login")
     private String adminLogin(@RequestParam(value = "adminID") String adminID,
-                              @RequestParam(value = "password") String password) {
-        return JSONArray.toJSONString(adminService.adminLogin(adminID, password));
+                              @RequestParam(value = "password") String password,
+                              HttpSession session) {
+        Map<String, Object> map = adminService.adminLogin(adminID, password);
+        if (Integer.parseInt((String) map.get("code")) == 1)
+            session.setAttribute("userSession", adminID);
+        return JSONArray.toJSONString(map);
     }
 
     @PostMapping("/logout")
     private String adminLogout(HttpSession session) {
-        session.removeAttribute("userSession");
-        return null;
+        Map<String, Object> map = adminService.adminLogout((String) session.getAttribute("userSession"));
+        if (Integer.parseInt((String) map.get("code")) == 1)
+            session.removeAttribute("userSession");
+        return JSONArray.toJSONString(map);
     }
 }
