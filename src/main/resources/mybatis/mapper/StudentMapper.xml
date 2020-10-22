@@ -50,7 +50,7 @@
             <if test="gender ==0 || gender == 1">gender = #{gender},</if>
             <if test="submitReason != ''">submit_reason = #{submitReason},</if>
             <if test="medicalRecord != ''">medical_record = #{medicalRecord},</if>
-            <if test="instituteNo != ''">institute_no = #{instituteNo}</if>
+            <if test="instituteNo != ''">institute_no = #{instituteNo},</if>
             <if test="class_no != ''">class_no = #{classNo}</if>
         </set>
         where stu_no = #{stuNo}
@@ -59,6 +59,10 @@
     <select id="findStudentByStuNo">
         select * from student where stu_no = #{stuNo}
     </select>
+
+    <update id="updateStudentVerifyStatus">
+        update student set verify_status = #{status} where stu_no = #{stuNo};
+    </update>
 
 </mapper>
 

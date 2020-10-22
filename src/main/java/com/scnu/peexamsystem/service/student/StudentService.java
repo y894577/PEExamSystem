@@ -5,7 +5,7 @@ import com.scnu.peexamsystem.entity.Student;
 import java.util.Map;
 
 public interface StudentService {
-    Map<String, Object> queryStudentList(String stuName, String instituteNo, String classNo, String grade, String status);
+    Map<String, Object> queryStudentList(String stuName, String instituteNo, String classNo, String grade, String status, int currentPageNo, int pageSize);
 
     Map<String, Object> queryStudent(String stuNo);
 
@@ -16,5 +16,7 @@ public interface StudentService {
     Map<String, Object> studentLogout(String stuNo);
 
     Map<String, Object> submitApplication(Student student);
+
+    Map<String, Object> modifyStatus(int status,String stuNo);
 
 }

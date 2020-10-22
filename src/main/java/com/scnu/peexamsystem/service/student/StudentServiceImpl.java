@@ -1,5 +1,9 @@
 package com.scnu.peexamsystem.service.student;
 
+import com.github.pagehelper.ISelect;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.scnu.peexamsystem.dao.student.StudentDao;
 import com.scnu.peexamsystem.entity.Institute;
 import com.scnu.peexamsystem.entity.Student;
@@ -21,15 +25,33 @@ public class StudentServiceImpl implements StudentService {
     StudentDao studentDao;
 
     @Override
-    public Map<String, Object> queryStudentList(String stuName, String instituteNo, String classNo, String grade, String status) {
+    public Map<String, Object> queryStudentList(String stuName, String instituteNo, String classNo, String grade, String status,
+                                                int currentPageNo, int pageSize) {
+
+        Map<String, Object> map = new HashMap<>();
 
         if (!StringUtils.isEmpty(stuName))
             stuName = "%" + stuName + "%";
 
-        List<Student> list = studentDao.findAllByCondition(stuName, instituteNo, classNo, grade, status);
+        String finalStuName = stuName;
+        PageInfo<Student> pageInfo = PageHelper.startPage(currentPageNo, pageSize).doSelectPageInfo(new ISelect() {
+            @Override
+            public void doSelect() {
+                studentDao.findAllByCondition(finalStuName, instituteNo, classNo, grade, status);
+            }
+        });
 
-        Map<String, Object> map = new HashMap<>();
-        map.put("result", list.toArray());
+
+        Map<String, Object> page = new HashMap<>();
+        page.put("currentPageNo", currentPageNo);
+        page.put("totalPage", pageInfo.getPageNum());
+        page.put("totalNum", pageInfo.getTotal());
+        page.put("currentNum", pageInfo.getSize());
+        map.put("page", page);
+
+
+        List<Student> list = pageInfo.getList();
+        map.put("result", list);
 
         return map;
     }
@@ -105,6 +127,22 @@ public class StudentServiceImpl implements StudentService {
         map.put("result", student);
         map.put("code", isUpdate ? 1 : 0);
 
+        return map;
+    }
+
+    @Override
+    public Map<String, Object> modifyStatus(int status, String stuNo) {
+        Map<String, Object> map = new HashMap<>();
+
+        boolean isUpdate = studentDao.updateStudentVerifyStatus(status, stuNo) > 0;
+        map.put("msg", "修改" + (isUpdate ? "成功" : "失败"));
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("stuNo",stuNo);
+        result.put("status", status);
+        map.put("result", result);
+
+        map.put("code", isUpdate ? 1 : 0);
         return map;
     }
 

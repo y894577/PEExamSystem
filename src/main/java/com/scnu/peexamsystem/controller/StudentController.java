@@ -22,9 +22,11 @@ public class StudentController {
                                     @RequestParam(value = "queryInstituteNo", required = false) String instituteNo,
                                     @RequestParam(value = "queryClassNo", required = false) String classNo,
                                     @RequestParam(value = "queryGrade", required = false) String grade,
-                                    @RequestParam(value = "queryStatus", required = false) String status) {
+                                    @RequestParam(value = "queryStatus", required = false) String status,
+                                    @RequestParam(value = "currentPageNo") int currentPageNo,
+                                    @RequestParam(value = "pageSize") int pageSize) {
 
-        Map<String, Object> map = studentService.queryStudentList(stuName, instituteNo, classNo, grade, status);
+        Map<String, Object> map = studentService.queryStudentList(stuName, instituteNo, classNo, grade, status, currentPageNo, pageSize);
         return JSONArray.toJSONString(map);
     }
 
@@ -67,4 +69,13 @@ public class StudentController {
 
         return JSONArray.toJSONString(studentService.submitApplication(student));
     }
+
+    @PostMapping("/verify")
+    private String modifyStatus(@RequestParam("stuNo") String stuNo,
+                                @RequestParam("status") int status) {
+
+        return JSONArray.toJSONString(studentService.modifyStatus(status, stuNo));
+    }
+
+
 }

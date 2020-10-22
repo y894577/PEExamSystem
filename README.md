@@ -232,13 +232,15 @@
 
 ### 请求参数
 
-|       参数       | 是否必须 |   说明   |
-| :--------------: | :------: | :------: |
-|   queryStuName   |    n     | 学生姓名 |
-| queryInstituteNo |    n     |  学院名  |
-|   queryClassNo   |    n     |  班级名  |
-|    queryGrade    |    n     |   年级   |
-|   queryStatus    |    n     | 审核状态 |
+|       参数       | 是否必须 |      说明      |
+| :--------------: | :------: | :------------: |
+|  currentPageNo   |    y     |    当前页标    |
+|     pageSize     |    y     | 每一页展示条数 |
+|   queryStuName   |    n     |    学生姓名    |
+| queryInstituteNo |    n     |     学院名     |
+|   queryClassNo   |    n     |     班级名     |
+|    queryGrade    |    n     |      年级      |
+|   queryStatus    |    n     |    审核状态    |
 
 ### 响应格式
 
@@ -321,41 +323,7 @@
 
 ### 请求参数
 
-| 参数  | 是否必须 |   说明   |
-| :---: | :------: | :------: |
-| stuNo |    y     | 管理员id |
-
-### 响应格式
-
-```json
-{
-	"msg":"退出登录成功",
-	"result":{
-		"stuID":"登录的用户ID",
-	},
-	"code":1
-}
-```
-
-### 响应说明
-
-|  参数  |         说明         |
-| :----: | :------------------: |
-|  msg   |       提示信息       |
-| result |      返回的参数      |
-|  code  | 状态码，1成功，0失败 |
-
-## 管理员退出登录
-
-> 请求方式：POST
->
-> 接口名：/admin/logout
-
-### 请求参数
-
-| 参数  | 是否必须 |   说明   |
-| :---: | :------: | :------: |
-| stuNo |    y     | 管理员id |
+无
 
 ### 响应格式
 
@@ -399,7 +367,7 @@
 	"result":[{"instituteNo":"",
               "instituteName":""},
               {
-                  ...同上
+                  //...同上
               }
               ],
 	"code":1
@@ -434,11 +402,11 @@
 {
 	"msg":"退出登录成功",
 	"result":[{	"classNo":"",
-              	"className":""，
+              	"className":"",
         		"grade":"",
               	"instituteNo":""},
               {
-                  ...同上
+                  //...同上
               },
               ],
 	"code":1

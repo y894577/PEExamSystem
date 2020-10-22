@@ -9,7 +9,7 @@ import java.util.List;
 
 @Repository
 @Mapper
-public interface AdminDao extends JpaRepository<Admin, Integer> {
+public interface AdminDao{
 
     Admin findAdminByAdminIDAndPassword(String adminID, String password);
 }
