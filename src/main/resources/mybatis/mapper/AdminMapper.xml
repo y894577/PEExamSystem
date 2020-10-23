@@ -5,7 +5,7 @@
 <mapper namespace="com.scnu.peexamsystem.dao.admin.AdminDao">
 
     <select id="findAdminByAdminIDAndPassword" resultType="Admin">
-        select * from admin where admin_id = #{adminId} and password = #{password}
+        select * from admin where admin_id = #{adminID} and password = #{password}
     </select>
 
 </mapper>

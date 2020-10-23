@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class AdminControllerTest {
+class InstituteControllerTest {
     @Autowired
     private TestRestTemplate restTemplate;
     private ResponseEntity<String> response;
@@ -30,13 +30,13 @@ class AdminControllerTest {
     private HttpEntity<MultiValueMap<String, Object>> request;
     private MultiValueMap<String, Object> postMap = new LinkedMultiValueMap<>();
     private Map<String, Object> getMap = new HashMap<>();
-    private final String basicUrl = "http://localhost:8001/admin";
+    private final String basicUrl = "http://localhost:8001/institute";
     private String url;
     private String method;
 
     @BeforeEach
     public void before() {
-        System.out.println("<<AdminController测试>>");
+        System.out.println("<<ClassController测试>>");
         headers.setContentType(MediaType.APPLICATION_JSON);
         System.out.println("---------------执行前---------------");
     }
@@ -67,17 +67,9 @@ class AdminControllerTest {
     }
 
     @Test
-    public void adminLogin() {
-        url = "/login";
-        postMap.add("adminID", "0001");
-        postMap.add("password", "123456");
-        method = "post";
-    }
-
-    @Test
-    public void adminLogout() {
-        url = "/logout";
-        method = "post";
+    public void queryInstituteList(){
+        url = "/query";
+        method = "get";
     }
 
 }

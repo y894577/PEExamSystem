@@ -21,7 +21,7 @@ public class AdminController {
                               @RequestParam(value = "password") String password,
                               HttpSession session) {
         Map<String, Object> map = adminService.adminLogin(adminID, password);
-        if (Integer.parseInt((String) map.get("code")) == 1)
+        if (map.get("code").equals("1"))
             session.setAttribute("userSession", adminID);
         return JSONArray.toJSONString(map);
     }
@@ -29,7 +29,7 @@ public class AdminController {
     @PostMapping("/logout")
     private String adminLogout(HttpSession session) {
         Map<String, Object> map = adminService.adminLogout((String) session.getAttribute("userSession"));
-        if (Integer.parseInt((String) map.get("code")) == 1)
+        if (map.get("code") == "1")
             session.removeAttribute("userSession");
         return JSONArray.toJSONString(map);
     }

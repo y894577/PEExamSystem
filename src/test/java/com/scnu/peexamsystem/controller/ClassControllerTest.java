@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class AdminControllerTest {
+class ClassControllerTest {
     @Autowired
     private TestRestTemplate restTemplate;
     private ResponseEntity<String> response;
@@ -30,13 +30,13 @@ class AdminControllerTest {
     private HttpEntity<MultiValueMap<String, Object>> request;
     private MultiValueMap<String, Object> postMap = new LinkedMultiValueMap<>();
     private Map<String, Object> getMap = new HashMap<>();
-    private final String basicUrl = "http://localhost:8001/admin";
+    private final String basicUrl = "http://localhost:8001/class";
     private String url;
     private String method;
 
     @BeforeEach
     public void before() {
-        System.out.println("<<AdminController测试>>");
+        System.out.println("<<ClassController测试>>");
         headers.setContentType(MediaType.APPLICATION_JSON);
         System.out.println("---------------执行前---------------");
     }
@@ -66,18 +66,19 @@ class AdminControllerTest {
         System.out.println("---------------执行后---------------");
     }
 
+
     @Test
-    public void adminLogin() {
-        url = "/login";
-        postMap.add("adminID", "0001");
-        postMap.add("password", "123456");
-        method = "post";
+    public void getGradeList() {
+        url = "/query/grade";
+        method = "get";
     }
 
     @Test
-    public void adminLogout() {
-        url = "/logout";
-        method = "post";
+    public void getClassList(){
+        url = "/query/list?instituteNo={instituteNo}&grade={grade}";
+        getMap.put("instituteNo","RJXY");
+        getMap.put("grade", "2018");
+        method = "get";
     }
 
 }
