@@ -35,28 +35,28 @@
     </select>
 
     <insert id="insertStudent">
-        insert into student (stuNo, password)
+        insert into student (stu_no, password)
         values (#{stuNo}, #{password});
     </insert>
 
     <select id="existStudent" resultType="int">
-        select count(*) as count where stu_no = #{stuNo};
+        select count(*) as count from student where stu_no = #{stuNo};
     </select>
 
     <update id="updateStudent">
         update student
         <set>
             <if test="stuName != ''">stu_name = #{stuName},</if>
-            <if test="gender ==0 || gender == 1">gender = #{gender},</if>
+            <if test="gender == 0 || gender == 1">gender = #{gender},</if>
             <if test="submitReason != ''">submit_reason = #{submitReason},</if>
             <if test="medicalRecord != ''">medical_record = #{medicalRecord},</if>
             <if test="instituteNo != ''">institute_no = #{instituteNo},</if>
-            <if test="class_no != ''">class_no = #{classNo}</if>
+            <if test="classNo != ''">class_no = #{classNo}</if>
         </set>
         where stu_no = #{stuNo}
     </update>
 
-    <select id="findStudentByStuNo">
+    <select id="findStudentByStuNo" resultType="Student">
         select * from student where stu_no = #{stuNo}
     </select>
 

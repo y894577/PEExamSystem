@@ -42,7 +42,7 @@ public class StudentController {
                                 @RequestParam(value = "password") String password) {
 
         Map<String, Object> map = studentService.studentLogin(stuNo, password);
-        if (Integer.parseInt((String) map.get("code")) == 1) {
+        if (map.get("code").equals("1")) {
             session.setAttribute("userSession", map.get("stuNo"));
         }
         return JSONArray.toJSONString(map);
@@ -59,20 +59,24 @@ public class StudentController {
     private String studentLogout(HttpSession session,
                                  @RequestParam(value = "stuNo") String stuNo) {
         session.removeAttribute("userSession");
+        boolean isRemoveSession = session.getAttribute("userSession") == null;
+        Map<String, Object> map = studentService.studentLogout(isRemoveSession, stuNo);
 
-        Map<String, Object> map = studentService.studentLogout(stuNo);
         return JSONArray.toJSONString(map);
     }
 
     @PostMapping("/submit")
-    private String submitApplication(Student student) {
-
-        return JSONArray.toJSONString(studentService.submitApplication(student));
+    private String submitApplication(Student student, HttpSession session) {
+        //需要验证发送请求方的session和实体类session是否一致
+        //防止恶意提交
+        //测试时加上session.getAttribute("userSession") == null，后期加入过滤器则删除
+        boolean isSession = session.getAttribute("userSession") == null || session.getAttribute("userSession").toString().equals(student.getStuNo());
+        return JSONArray.toJSONString(studentService.submitApplication(student, isSession));
     }
 
     @PostMapping("/verify")
     private String modifyStatus(@RequestParam("stuNo") String stuNo,
-                                @RequestParam("status") int status) {
+                                @RequestParam("status") String status) {
 
         return JSONArray.toJSONString(studentService.modifyStatus(status, stuNo));
     }

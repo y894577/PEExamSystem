@@ -29,7 +29,7 @@ public interface StudentDao {
 
     Student findStudentByStuNo(@Param("stuNo") String stuNo);
 
-    int updateStudentVerifyStatus(@Param("status") int status,
+    int updateStudentVerifyStatus(@Param("status") String status,
                                   @Param("stuNo") String stuNo);
 
 }

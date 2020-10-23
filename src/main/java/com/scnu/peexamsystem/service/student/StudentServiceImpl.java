@@ -87,7 +87,7 @@ public class StudentServiceImpl implements StudentService {
         Map<String, Object> map = new HashMap<>();
         boolean isExist = studentDao.existStudent(stuNo) > 0;
 
-        if (isExist) {
+        if (!isExist) {
             password = DigestUtils.md5DigestAsHex(password.getBytes());
             boolean isRegister = studentDao.insertStudent(stuNo, password) > 0;
             map.put("msg", "注册" + (isRegister ? "成功" : "失败"));
@@ -105,25 +105,25 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public Map<String, Object> studentLogout(String stuNo) {
+    public Map<String, Object> studentLogout(boolean isRemoveSession, String stuNo) {
         Map<String, Object> map = new HashMap<>();
 
-        map.put("msg", "退出登录成功");
+        map.put("msg", "退出登录" + (isRemoveSession ? "成功" : "失败"));
         Map<String, Object> result = new HashMap<>();
         result.put("stuNo", stuNo);
         map.put("result", result);
-        map.put("code", 1);
+        map.put("code", isRemoveSession ? 1 : 0);
 
         return map;
     }
 
     @Override
-    public Map<String, Object> submitApplication(Student student) {
+    public Map<String, Object> submitApplication(Student student, boolean isSession) {
         Map<String, Object> map = new HashMap<>();
 
-        boolean isUpdate = studentDao.updateStudent(student) > 0;
+        boolean isUpdate = isSession && studentDao.updateStudent(student) > 0;
 
-        map.put("msg", "提交申请" + (isUpdate ? "成功" : "失败"));
+        map.put("msg", "提交申请" + (isUpdate && isSession ? "成功" : "失败"));
         map.put("result", student);
         map.put("code", isUpdate ? 1 : 0);
 
@@ -131,14 +131,14 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public Map<String, Object> modifyStatus(int status, String stuNo) {
+    public Map<String, Object> modifyStatus(String status, String stuNo) {
         Map<String, Object> map = new HashMap<>();
 
         boolean isUpdate = studentDao.updateStudentVerifyStatus(status, stuNo) > 0;
         map.put("msg", "修改" + (isUpdate ? "成功" : "失败"));
 
         Map<String, Object> result = new HashMap<>();
-        result.put("stuNo",stuNo);
+        result.put("stuNo", stuNo);
         result.put("status", status);
         map.put("result", result);
 

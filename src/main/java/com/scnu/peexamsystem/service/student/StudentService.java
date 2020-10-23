@@ -13,10 +13,10 @@ public interface StudentService {
 
     Map<String, Object> registerStudent(String stuNo, String password);
 
-    Map<String, Object> studentLogout(String stuNo);
+    Map<String, Object> studentLogout(boolean isRemoveSession, String stuNo);
 
-    Map<String, Object> submitApplication(Student student);
+    Map<String, Object> submitApplication(Student student,boolean isSession);
 
-    Map<String, Object> modifyStatus(int status,String stuNo);
+    Map<String, Object> modifyStatus(String status, String stuNo);
 
 }
