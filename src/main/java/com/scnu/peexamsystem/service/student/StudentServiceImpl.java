@@ -1,20 +1,19 @@
 package com.scnu.peexamsystem.service.student;
 
 import com.github.pagehelper.ISelect;
-import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.scnu.peexamsystem.dao.student.StudentDao;
-import com.scnu.peexamsystem.entity.Institute;
 import com.scnu.peexamsystem.entity.Student;
+import com.scnu.peexamsystem.util.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.domain.Specification;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
-import javax.persistence.criteria.*;
-import java.util.ArrayList;
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +22,11 @@ import java.util.Map;
 public class StudentServiceImpl implements StudentService {
     @Autowired
     StudentDao studentDao;
+
+    @Value("${upload.file.path}")
+    private String filePath;
+    @Value("${upload.file.size}")
+    private int fileMaxSize;
 
     @Override
     public Map<String, Object> queryStudentList(String stuName, String instituteNo, String classNo, String grade, String status,
@@ -51,6 +55,8 @@ public class StudentServiceImpl implements StudentService {
 
 
         List<Student> list = pageInfo.getList();
+        map.put("msg", "查询学生列表成功");
+        map.put("code", 1);
         map.put("result", list);
 
         return map;
@@ -143,6 +149,37 @@ public class StudentServiceImpl implements StudentService {
         map.put("result", result);
 
         map.put("code", isUpdate ? 1 : 0);
+        return map;
+    }
+
+    @Override
+    public Map<String, Object> uploadImg(MultipartFile file, String stuNo) throws Exception {
+        Map<String, Object> map = new HashMap<>();
+        if (file.isEmpty()) {
+            map.put("msg", "文件为空");
+            map.put("code", -1);
+        }
+        //图片文件类型
+        String contentType = file.getContentType();
+        if (contentType != null && (contentType.equals("image/jpg") || contentType.equals("image/png") || contentType.equals("image/jpeg"))) {
+            long size = file.getSize() / 1024 / 1024;
+            if (size > fileMaxSize) {
+                map.put("msg", "图片大小不能超过" + fileMaxSize + "M");
+                map.put("code", -1);
+            } else {
+                //图片后缀
+                String suffix = file.getOriginalFilename().split("\\.")[1];
+                //图片名字
+                String newName = stuNo + "." + suffix;
+                //上传文件工具类
+                boolean isUpload = FileUtil.uploadFile(file.getBytes(), filePath + stuNo, "/" + newName);
+                map.put("msg", "图片上传" + (isUpload ? "成功" : "失败"));
+                map.put("code", isUpload ? 1 : 0);
+            }
+        } else {
+            map.put("msg", "请上传jpg、png、jpeg格式的文件");
+            map.put("code", -1);
+        }
         return map;
     }
 

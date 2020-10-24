@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员界面</title>
+    <!-- 引入vue.js -->
+    <script src="js/vue.js" type="text/javascript" charset="utf-8"></script>
+    <!-- 引入element样式 -->
+    <link rel="stylesheet" href="css/index.css">
+    <!-- 引入element组件库 -->
+    <script src="js/index.js"></script>
+    <!-- 引入axios.js -->
+    <script src="js/axios.min.js"></script>
+</head>
+
+<body>
+<div id="app" style="margin-bottom: 40px;">
+    <el-container>
+        <el-header style="background-color: #409EFF;color: #333;text-align: center;line-height: 60px;">查询列表
+        </el-header>
+        <el-main style="background-color: #E9EEF3;color: #333;text-align: center;">
+            <el-row :gutter="10" style="height: 60px;">
+                <el-col :lg="4" :sm="4" :xs="8">
+                    <div class="grid-content bg-purple">
+                        <el-input placeholder="学生姓名" v-model="stuName" clearable>
+                        </el-input>
+                    </div>
+                </el-col>
+                <el-col :lg="4" :sm="4" :xs="8">
+                    <div class="grid-content bg-purple">
+                        <template>
+                            <el-select v-model="instituteNo" @change="getClassLists()" clearable placeholder="选择学院">
+                                <el-option v-for="item in instituteLists" :key="item.instituteNo"
+                                           :label="item.instituteName" :value="item.instituteNo">
+                                    <span style="float: left">{{ item.instituteName }}</span>
+                                    <span
+                                            style="float: right; color: #8492a6; font-size: 13px">{{ item.instituteNo }}</span>
+                                </el-option>
+                            </el-select>
+                        </template>
+                    </div>
+                </el-col>
+                <el-col :lg="4" :sm="4" :xs="8">
+                    <div class="grid-content bg-purple">
+                        <template>
+                            <el-select v-model="grade" @change="getClassLists()" clearable placeholder="选择年级">
+                                <el-option v-for="item in gradeLists" :key="item" :label="item" :value="item">
+                                </el-option>
+                            </el-select>
+                        </template>
+                    </div>
+                </el-col>
+                <el-col :lg="4" :sm="4" :xs="8">
+                    <div class="grid-content bg-purple">
+                        <template>
+                            <el-select v-model="classNo" :disabled="classDisabled" clearable placeholder="选择班级">
+                                <el-option v-for="item in classLists" :key="item.classNo" :label="item.className"
+                                           :value="item.classNo">
+                                </el-option>
+                            </el-select>
+                        </template>
+                    </div>
+                </el-col>
+                <el-col :lg="4" :sm="4" :xs="8">
+                    <div class="grid-content bg-purple">
+                        <template>
+                            <el-select v-model="status" clearable placeholder="审核状态">
+                                <el-option v-for="sta in statusLists" :key="sta.value" :label="sta.value"
+                                           :value="sta.status">
+                                </el-option>
+                            </el-select>
+                        </template>
+                    </div>
+                </el-col>
+                <el-col :lg="4" :sm="4" :xs="8">
+                    <div class="grid-content bg-purple">
+                        <el-button type="primary" @click="loadList()">查询</el-button>
+                    </div>
+                </el-col>
+            </el-row>
+            <div style="margin-top: 10px;">
+                <template>
+                    <el-table :data="tableData" style="width: 100%;" :max-height="height" stripe>
+
+                        <el-table-column prop="stuNo" label="学号" min-width="120">
+                        </el-table-column>
+                        <el-table-column prop="stuName" label="姓名" min-width="120">
+                        </el-table-column>
+                        <el-table-column prop="gender" label="性别" min-width="80">
+                        </el-table-column>
+                        <el-table-column prop="instituteName" label="学院" min-width="120">
+                        </el-table-column>
+                        <el-table-column prop="className" label="班级" min-width="120">
+                        </el-table-column>
+                        <el-table-column prop="grade" label="年级" min-width="120">
+                        </el-table-column>
+                        <el-table-column prop="status" label="审核状态" min-width="120">
+                        </el-table-column>
+                        <el-table-column fixed="right" label="操作" width="60">
+                            <template slot-scope="scope">
+                                <el-button @click="handleClick(scope.row);" type="text" size="small">查看
+                                </el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </template>
+            </div>
+
+
+            <div class="block">
+                <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" background
+                               layout="sizes, prev, pager, next, jumper" :current-page="currentPage"
+                               :page-sizes="[5, 10, 20, 30]" :page-size="pageSize" :total="totalNum">
+                </el-pagination>
+            </div>
+        </el-main>
+        <el-footer>
+
+        </el-footer>
+    </el-container>
+</div>
+</body>
+<script>
+
+    var Main = {
+        methods: {
+            getInstituteLists() {
+                axios({
+                    method: 'get',
+                    url: '/institute/query'
+                }).then(function (response) {
+                    console.log(response.data)
+                    if (response.data.code) {
+                        app.instituteLists = response.data.result;
+                    }
+                }).catch(function (error) {
+                    console.log(error)
+                });
+            },
+            getGradeLists() {
+                axios({
+                    method: 'get',
+                    url: '/class/query/grade'
+                }).then(function (response) {
+                    console.log(response.data)
+                    if (response.data.code == 1) {
+                        app.gradeLists = response.data.result;
+                    }
+                }).catch(function (error) {
+                    console.log(error)
+                });
+            },
+            getClassLists() {
+                app.classNo = '';
+                if (app.instituteNo !== '' && app.grade !== '') {
+                    axios({
+                        method: 'get',
+                        url: '/class/query/list',
+                        params: {
+                            instituteNo: app.instituteNo,
+                            grade: app.grade
+                        }
+                    }).then(function (response) {
+                        console.log(response.data)
+                        if (response.data.code === 1) {
+                            app.classLists = response.data.result;
+                        } else {
+                            console.log(response.data.msg);
+                        }
+                    }).catch(function (error) {
+                        console.log(error)
+                    });
+                    app.classDisabled = false;
+                } else {
+                    app.classDisabled = true;
+                }
+            },
+            loadList() {
+                axios({
+                    method: 'get',
+                    url: '/student/query/list',
+                    params: {
+                        currentPageNo: app.currentPage,
+                        pageSize: app.pageSize,
+                        queryStuName: app.stuName,
+                        queryInstituteNo: app.instituteNo,
+                        queryClassNo: app.classNo,
+                        queryGrade: app.grade,
+                        queryStatus: app.status
+                    }
+                }).then(function (response) {
+                    console.log(response.data)
+                    if (response.data.code === 1) {
+                        app.tableData = response.data.result;
+                    }
+                }).catch(function (error) {
+                    console.log(error)
+                });
+            },
+            handleClick(row) {
+                console.log(row);
+
+            },
+            handleSizeChange(val) {
+                app.pageSize = val;
+                console.log(`每页 ${val} 条`);
+            },
+            handleCurrentChange(val) {
+                console.log(`当前第: ${val} 页`);
+            }
+        },
+        data() {
+            const item = {
+                stuNo: '20192005037',
+                stuName: '何怡晖',
+                gender: '男',
+                instituteName: '软件学院',
+                className: '软工四班',
+                grade: '2019级',
+                status: '未审核'
+            };
+            return {
+                tableData: [],
+                height: window.innerHeight - 280,
+                currentPage: 1,
+                stuName: '',
+                pageSize: 10,
+                totalNum: 0,
+                instituteNo: '',
+                instituteName: '',
+                classNo: '',
+                className: '',
+                classDisabled: true,
+                grade: '',
+                status: '未审核',
+                instituteLists: [],
+                statusLists: [{
+                    value: '未审核',
+                    status: '0'
+                }, {
+                    value: '已审核',
+                    status: '1'
+                }, {
+                    value: '未通过',
+                    status: '-1'
+                }],
+                gradeLists: [],
+                classLists: [],
+            }
+        },
+        mounted: function () {
+            this.getInstituteLists();
+            this.getGradeLists();
+        }
+
+    }
+    var Ctor = Vue.extend(Main)
+    var app = new Ctor().$mount('#app')
+    console.log(app);
+</script>
+
+</html>

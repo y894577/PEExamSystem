@@ -13,4 +13,9 @@ public class MainConfiguration implements WebMvcConfigurer {
 //        registration.addPathPatterns("/**");
 //        registration.excludePathPatterns("/**/login.html");
     }
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/student/uploadFile/**").addResourceLocations("classpath:/resources/uploadFile/");
+    }
 }

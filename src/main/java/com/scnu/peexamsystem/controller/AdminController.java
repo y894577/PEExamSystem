@@ -4,17 +4,23 @@ import com.alibaba.fastjson.JSONArray;
 import com.scnu.peexamsystem.service.admin.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
 import java.util.Map;
 
 
 @RestController
-@RequestMapping(value = "/admin")
+@RequestMapping("/admin")
 public class AdminController {
-
     @Autowired
     AdminService adminService;
+
+    @RequestMapping("")
+    private ModelAndView admin(){
+        ModelAndView mv = new ModelAndView("admin");
+        return mv;
+    }
 
     @PostMapping("/login")
     private String adminLogin(@RequestParam(value = "adminID") String adminID,

@@ -1,14 +1,18 @@
 package com.scnu.peexamsystem.controller;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.scnu.peexamsystem.entity.Student;
 import com.scnu.peexamsystem.service.student.StudentService;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
-import java.util.HashMap;
+import java.io.File;
 import java.util.Map;
 
 @RestController
@@ -16,6 +20,12 @@ import java.util.Map;
 public class StudentController {
     @Autowired
     StudentService studentService;
+
+    @RequestMapping("")
+    private ModelAndView student() {
+        ModelAndView mv = new ModelAndView("upload");
+        return mv;
+    }
 
     @GetMapping("/query/list")
     private String queryStudentList(@RequestParam(value = "queryStuName", required = false) String stuName,
@@ -81,5 +91,22 @@ public class StudentController {
         return JSONArray.toJSONString(studentService.modifyStatus(status, stuNo));
     }
 
+    @PostMapping("/upload")
+    private String uploadImage(@RequestParam("file") MultipartFile file, HttpSession session) throws Exception {
 
+        String stuNo = session.getAttribute("userSession").toString();
+        Map<String, Object> map = studentService.uploadImg(file, stuNo);
+
+        return JSONArray.toJSONString(map);
+    }
+
+    @GetMapping("/showimg")
+    private ModelAndView showImg(@RequestParam("stuNo") String stuNo) {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("index");
+        File file = new File("src/main/resources/resources/uploadFile/" + stuNo);
+        File[] files = file.listFiles();
+        modelAndView.getModel().put("filePath", "uploadFile/" + stuNo + "/" + files[0].getName());
+        return modelAndView;
+    }
 }
