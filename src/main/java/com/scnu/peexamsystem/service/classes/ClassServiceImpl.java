@@ -25,10 +25,10 @@ public class ClassServiceImpl implements ClassService {
             Scanner s = new Scanner(inputStream).useDelimiter(",");
             while (s.hasNext())
                 grade.add(s.next());
+            inputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         boolean isGet = !grade.isEmpty();
 
         map.put("msg", "获取grade" + (isGet ? "成功" : "失败"));

@@ -8,7 +8,6 @@ import org.springframework.util.DigestUtils;
 import org.springframework.util.ObjectUtils;
 
 
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,12 +22,13 @@ public class AdminServiceImpl implements AdminService {
     public Map<String, Object> adminLogin(String adminID, String password) {
         String pwd = DigestUtils.md5DigestAsHex(password.getBytes());
         Admin admin = adminDao.findAdminByAdminIDAndPassword(adminID, pwd);
-        boolean isLogin = !ObjectUtils.isEmpty(admin);
+        boolean isLogin = admin != null;
         Map<String, Object> map = new HashMap<>();
         Map<String, Object> result = new HashMap<>();
-
-        result.put("adminID", admin.getAdminID());
-        result.put("adminName", admin.getAdminName());
+        if (isLogin) {
+            result.put("adminID", admin.getAdminID());
+            result.put("adminName", admin.getAdminName());
+        }
         map.put("msg", "登录" + (isLogin ? "成功" : "失败"));
         map.put("result", result);
         map.put("code", isLogin ? 1 : 0);

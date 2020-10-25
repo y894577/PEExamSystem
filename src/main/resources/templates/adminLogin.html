@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <!-- 引入vue.js -->
+    <script src="js/vue.js" type="text/javascript" charset="utf-8"></script>
+    <!-- 引入element样式 -->
+    <link rel="stylesheet" href="css/index.css">
+    <!-- 引入element组件库 -->
+    <script src="js/index.js"></script>
+    <!-- 引入axios.js -->
+    <script src="js/axios.min.js"></script>
+</head>
+
+<body>
+
+<div id="app">
+    <el-container style="display: flex;justify-content: center;margin-top: 100px">
+        <div style="font-family: 'Microsoft YaHei UI';font-size: 50px;color: #2d6a88">
+            管理员登录
+        </div>
+    </el-container>
+    <el-container style="display: flex;justify-content: center;align-items: center;margin-top: 50px">
+        <div style="width: 400px;padding-top: 30px;box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1)">
+            <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="100px"
+                     class="demo-ruleForm">
+                <el-form-item label="账号" prop="adminID">
+                    <el-input type="adminID" v-model="ruleForm.adminID" autocomplete="off" style="width: 200px"
+                              id="adminID"></el-input>
+                </el-form-item>
+                <el-form-item label="密码" prop="password">
+                    <el-input type="password" v-model="ruleForm.password" autocomplete="off" id="passwd"
+                              style="width: 200px"></el-input>
+                </el-form-item>
+
+                <p></p>
+                <el-form-item>
+                    <el-button type="primary" @click="submitForm('ruleForm')">登录</el-button>
+                    <el-button @click="resetForm('ruleForm')">重置</el-button>
+                </el-form-item>
+            </el-form>
+        </div>
+    </el-container>
+    <div style="position: absolute;left: 52%;margin-top: 40px">
+        <el-link type="info" @click="login">我是用户...</el-link>
+    </div>
+</div>
+</body>
+
+
+<script>
+    var app = new Vue({
+        el: '#app',
+        props: {
+            identifyCode: {
+                type: String,
+                default: '1234'
+            },
+            fontSizeMin: {
+                type: Number,
+                default: 16
+            },
+            fontSizeMax: {
+                type: Number,
+                default: 40
+            },
+            backgroundColorMin: {
+                type: Number,
+                default: 180
+            },
+            backgroundColorMax: {
+                type: Number,
+                default: 240
+            },
+            colorMin: {
+                type: Number,
+                default: 50
+            },
+            colorMax: {
+                type: Number,
+                default: 160
+            },
+            lineColorMin: {
+                type: Number,
+                default: 40
+            },
+            lineColorMax: {
+                type: Number,
+                default: 180
+            },
+            dotColorMin: {
+                type: Number,
+                default: 0
+            },
+            dotColorMax: {
+                type: Number,
+                default: 255
+            },
+            contentWidth: {
+                type: Number,
+                default: 112
+            },
+            contentHeight: {
+                type: Number,
+                default: 38
+            }
+        },
+        data() {
+            var checkadminID = (rule, value, callback) => {
+                if (value === '') {
+                    return callback(new Error('学号不能为空'));
+                }
+            };
+            var validatePass = (rule, value, callback) => {
+                if (value === '') {
+                    callback(new Error('请输入密码'));
+                } else {
+                    if (this.ruleForm.checkPass !== '') {
+                        this.$refs.ruleForm.validateField('checkPass');
+                    }
+                    callback();
+                }
+            };
+
+            return {
+                ruleForm: {
+                    adminID: '',
+                    password: '',
+                    identify: ''
+                },
+                rules: {
+                    adminID: [
+                        {required: true, message: '账号不能为空', trigger: 'blur'},
+                        // {validator: checkEmail, trigger: 'blur'}
+                    ],
+                    password: [
+                        {required: true, message: '密码不能为空', trigger: 'blur'},
+                        {min: 6, max: 18, message: '请输入6至18位字符', trigger: 'blur'},
+                        {validator: validatePass, trigger: 'blur'}
+                    ]
+                }
+            };
+        },
+        methods: {
+            login: function () {
+                // window.open('../login/login.html')
+            },
+            submitForm: function (formName) {
+                var that = this;
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        axios({
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            transformRequest: [function (data) {
+                                let ret = ''
+                                for (let it in data) {
+                                    ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&'
+                                }
+                                return ret
+                            }],
+                            method: 'post',
+                            url: '/admin/login',
+                            data: {
+                                adminID: that.ruleForm.adminID,
+                                password: that.ruleForm.password,
+                            }
+                        }).then(function (response) {
+                            console.log(response.data);
+                            if (response.data.code === 1) {
+                                app.$message({
+                                    message: '登陆成功',
+                                    type: 'success'
+                                });
+                                window.location.replace('adminLists.html');
+                            } else {
+                                app.$message.error('登陆失败');
+                            }
+
+                        }).catch(function (error) {
+                            console.log(error);
+                            app.$message.error('登陆失败');
+                        });
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
+                });
+            },
+            resetForm: function (formName) {
+                this.$refs[formName].resetFields();
+            },
+        }
+    })
+
+</script>
+
+</html>

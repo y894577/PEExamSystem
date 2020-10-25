@@ -3,6 +3,7 @@ package com.scnu.peexamsystem.controller;
 import com.alibaba.fastjson.JSONArray;
 import com.scnu.peexamsystem.entity.Student;
 import com.scnu.peexamsystem.service.student.StudentService;
+import com.scnu.peexamsystem.util.ConstantUtil;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
@@ -21,9 +22,9 @@ public class StudentController {
     @Autowired
     StudentService studentService;
 
-    @RequestMapping("")
-    private ModelAndView student() {
-        ModelAndView mv = new ModelAndView("upload");
+    @RequestMapping("/{viewName}.html")
+    private ModelAndView student(@PathVariable String viewName) {
+        ModelAndView mv = new ModelAndView(viewName);
         return mv;
     }
 
@@ -35,6 +36,7 @@ public class StudentController {
                                     @RequestParam(value = "queryStatus", required = false) String status,
                                     @RequestParam(value = "currentPageNo") int currentPageNo,
                                     @RequestParam(value = "pageSize") int pageSize) {
+
 
         Map<String, Object> map = studentService.queryStudentList(stuName, instituteNo, classNo, grade, status, currentPageNo, pageSize);
         return JSONArray.toJSONString(map);
@@ -52,8 +54,8 @@ public class StudentController {
                                 @RequestParam(value = "password") String password) {
 
         Map<String, Object> map = studentService.studentLogin(stuNo, password);
-        if (map.get("code").equals("1")) {
-            session.setAttribute("userSession", map.get("stuNo"));
+        if (Integer.parseInt(String.valueOf(map.get("code"))) == 1) {
+            session.setAttribute(ConstantUtil.USER_SESSION_KEY, map.get("stuNo"));
         }
         return JSONArray.toJSONString(map);
     }
@@ -68,8 +70,8 @@ public class StudentController {
     @PostMapping("/logout")
     private String studentLogout(HttpSession session,
                                  @RequestParam(value = "stuNo") String stuNo) {
-        session.removeAttribute("userSession");
-        boolean isRemoveSession = session.getAttribute("userSession") == null;
+        session.removeAttribute(ConstantUtil.USER_SESSION_KEY);
+        boolean isRemoveSession = session.getAttribute(ConstantUtil.USER_SESSION_KEY) == null;
         Map<String, Object> map = studentService.studentLogout(isRemoveSession, stuNo);
 
         return JSONArray.toJSONString(map);
@@ -79,8 +81,8 @@ public class StudentController {
     private String submitApplication(Student student, HttpSession session) {
         //需要验证发送请求方的session和实体类session是否一致
         //防止恶意提交
-        //测试时加上session.getAttribute("userSession") == null，后期加入过滤器则删除
-        boolean isSession = session.getAttribute("userSession") == null || session.getAttribute("userSession").toString().equals(student.getStuNo());
+        //测试时加上session.getAttribute(ConstantUtil.USER_SESSION_KEY) == null，后期加入过滤器则删除
+        boolean isSession = session.getAttribute(ConstantUtil.USER_SESSION_KEY) == null || session.getAttribute("userSession").toString().equals(student.getStuNo());
         return JSONArray.toJSONString(studentService.submitApplication(student, isSession));
     }
 
@@ -94,7 +96,7 @@ public class StudentController {
     @PostMapping("/upload")
     private String uploadImage(@RequestParam("file") MultipartFile file, HttpSession session) throws Exception {
 
-        String stuNo = session.getAttribute("userSession").toString();
+        String stuNo = session.getAttribute(ConstantUtil.USER_SESSION_KEY).toString();
         Map<String, Object> map = studentService.uploadImg(file, stuNo);
 
         return JSONArray.toJSONString(map);

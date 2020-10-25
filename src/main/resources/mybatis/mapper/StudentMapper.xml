@@ -11,14 +11,17 @@
         cla.class_name as className
         from student as stu, institute as ins, class as cla
         <where>
+            stu.institute_no = ins.institute_no
+            and ins.institute_no = cla.institute_no
+            and stu.class_no = cla.class_no
             <if test="stuName != '' and stuName != null">
-                stu.stu_name like #{stuName}
+                and stu.stu_name like #{stuName}
             </if>
             <if test="instituteNo != '' and instituteNo != null">
                 and stu.institute_no = #{instituteNo}
             </if>
             <if test="classNo != '' and classNo != null">
-                and stu.class_no = #{classNo}
+                and cla.class_no = #{classNo}
             </if>
             <if test="grade != '' and grade != null">
                 and cla.grade = #{grade}

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+    <!-- 引入vue.js -->
+    <script src="js/vue.js" type="text/javascript" charset="utf-8"></script>
+    <!-- 引入element样式 -->
+    <link rel="stylesheet" href="css/index.css">
+    <!-- 引入element组件库 -->
+    <script src="js/index.js"></script>
+    <!-- 引入axios.js -->
+    <script src="js/axios.min.js"></script>
+</head>
+
+<body>
+<div id="app">
+    <el-container style="display: flex;justify-content: center;align-items: center;">
+        <div>
+            <el-container style="display: flex;justify-content: center;margin-top: 100px">
+                <div style="font-family: 'Microsoft YaHei UI';font-size: 50px;color: #2d6a88">
+                    注 册
+                </div>
+            </el-container>
+            <el-container style="position: relative;justify-content: center;align-items: center;margin-top: 50px">
+                <div style="width: 500px;padding-top: 30px;box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1)">
+                    <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="100px"
+                             style="position: relative;left: 11%;">
+                        <el-form-item label="学号" prop="stuNo">
+                            <el-input type="stuNo" v-model="ruleForm.stuNo" autocomplete="off"
+                                      style="width: 200px"></el-input>
+                        </el-form-item>
+                        <el-form-item label="密码" prop="password">
+                            <el-input type="password" v-model="ruleForm.password" autocomplete="off"
+                                      style="width: 200px"></el-input>
+                        </el-form-item>
+                        <el-form-item label="确认密码" prop="checkPass">
+                            <el-input type="password" v-model="ruleForm.checkPass" autocomplete="off"
+                                      style="width: 200px"></el-input>
+                        </el-form-item>
+   
+                        <el-form-item>
+                            <el-button type="primary" @click="submitForm('ruleForm')">注册</el-button>
+                            <el-button @click="resetForm('ruleForm')">重置</el-button>
+                        </el-form-item>
+                    </el-form>
+                </div>
+            </el-container>
+            <div style="position: absolute;left: 52%;margin-top: 40px">
+                <el-link type="info" @click="login">已有账号，点击登录</el-link>
+            </div>
+        </div>
+    </el-container>
+</div>
+</body>
+<script>
+    var app =new Vue({
+        el: '#app',
+        data() {
+            var validatePass = (rule, value, callback) => {
+                if (value === '') {
+                    callback(new Error('请输入密码'));
+                } else {
+                    if (this.ruleForm.checkPass !== '') {
+                        this.$refs.ruleForm.validateField('checkPass');
+                    }
+                    callback();
+                }
+            };
+            var validatePass2 = (rule, value, callback) => {
+                if (value === '') {
+                    callback(new Error('请再次输入密码'));
+                } else if (value !== this.ruleForm.password) {
+                    callback(new Error('两次输入密码不一致!'));
+                } else {
+                    callback();
+                }
+            };
+            return {
+                ruleForm: {
+                    stuNo: '',
+                    password: '',
+                    checkPass: '',
+                    identify: ''
+                },
+                rules: {
+                    stuNo: [
+                        {required: true, message: '学号不能为空', trigger: 'blur'},
+                    ],
+                    password: [
+                        {required: true, message: '密码不能为空', trigger: 'blur'},
+                        {min: 6, max: 18, message: '请输入6至18位数字', trigger: 'blur'},
+                        {validator: validatePass, trigger: 'blur'},
+                    ],
+                    checkPass: [
+                        {required: true, message: '确认密码不能为空', trigger: 'blur'},
+                        {min: 6, max: 18, message: '请输入6至18位数字', trigger: 'blur'},
+                        {validator: validatePass2, trigger: 'blur'}
+                    ]
+                }
+            };
+        },
+        methods: {
+            login: function () {
+                window.location.replace('adminLogin.html');
+            },
+            submitForm(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        axios({
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            transformRequest: [function (data) {
+                                let ret = ''
+                                for (let it in data) {
+                                    ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&'
+                                }
+                                return ret
+                            }],
+                            method: 'post',
+                            url: '/student/register',
+                            data: {
+                                stuNo: this.ruleForm.stuNo,
+                                password: this.ruleForm.pass,
+                            }
+                        }).then(function (response) {
+                            console.log(response.data);
+                            if (response.data.code == 1){
+                                app.$message({
+                                    message: '注册成功',
+                                    type: 'success'
+                                });
+                                window.location.replace('adminLogin.html');
+                            }
+                            else{
+                                app.$message.error('注册失败');
+                            }
+                        }).catch(function (error) {
+                            app.$message.error('注册失败');
+                            console.log(error);
+                        })
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
+                })
+            },
+            resetForm(formName) {
+                this.$refs[formName].resetFields();
+            }
+        }
+    })
+
+</script>
+</html>
