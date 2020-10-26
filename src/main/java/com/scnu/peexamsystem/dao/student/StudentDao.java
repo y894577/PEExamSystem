@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface StudentDao {
 
-    int existsByStuNoAndPassword(@Param("stuNo") String stuNo,
+    Student findByStuNoAndPassword(@Param("stuNo") String stuNo,
                                  @Param("password") String password);
 
     List<Student> findAllByCondition(@Param("stuName") String stuName,

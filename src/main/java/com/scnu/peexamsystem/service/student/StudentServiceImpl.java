@@ -78,10 +78,13 @@ public class StudentServiceImpl implements StudentService {
     public Map<String, Object> studentLogin(String stuNo, String password) {
         Map<String, Object> map = new HashMap<>();
         password = DigestUtils.md5DigestAsHex(password.getBytes());
-        boolean isLogin = studentDao.existsByStuNoAndPassword(stuNo, password) > 0;
+        Student student = studentDao.findByStuNoAndPassword(stuNo, password);
+        boolean isLogin = student != null;
         map.put("msg", "登录" + (isLogin ? "成功" : "失败"));
         Map<String, Object> result = new HashMap<>();
         result.put("stuNo", stuNo);
+        if (isLogin)
+            map.put("submit", !StringUtils.isEmpty(student.getSubmitReason()));
         map.put("result", result);
         map.put("code", isLogin ? 1 : 0);
         return map;

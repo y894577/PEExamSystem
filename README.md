@@ -224,7 +224,8 @@
         "instituteName":"学院名",
         "className":"班级名",
         "instituteNo":"学院号",
-        "classNo":"班级号"
+        "classNo":"班级号",
+        "status":"审核状态"
 	},
 	"code":1
 }

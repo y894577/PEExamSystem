@@ -22,11 +22,11 @@ public class StudentController {
     @Autowired
     StudentService studentService;
 
-    @RequestMapping("/{viewName}.html")
-    private ModelAndView student(@PathVariable String viewName) {
-        ModelAndView mv = new ModelAndView(viewName);
-        return mv;
-    }
+//    @RequestMapping("/{viewName}.html")
+//    private ModelAndView student(@PathVariable String viewName) {
+//        ModelAndView mv = new ModelAndView(viewName);
+//        return mv;
+//    }
 
     @GetMapping("/query/list")
     private String queryStudentList(@RequestParam(value = "queryStuName", required = false) String stuName,
@@ -55,8 +55,10 @@ public class StudentController {
 
         Map<String, Object> map = studentService.studentLogin(stuNo, password);
         if (Integer.parseInt(String.valueOf(map.get("code"))) == 1) {
-            session.setAttribute(ConstantUtil.USER_SESSION_KEY, map.get("stuNo"));
+            session.setAttribute(ConstantUtil.USER_SESSION_KEY, stuNo);
         }
+        boolean isSubmit = (boolean) map.get("submit");
+        session.setAttribute(ConstantUtil.STUDENT_SUBMIT_STATUS, isSubmit);
         return JSONArray.toJSONString(map);
     }
 

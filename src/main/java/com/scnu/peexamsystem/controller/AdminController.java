@@ -17,27 +17,21 @@ public class AdminController {
     @Autowired
     AdminService adminService;
 
-//    @RequestMapping("")
-//    private ModelAndView admin() {
-//        ModelAndView mv = new ModelAndView("adminLists");
-//        return mv;
-//    }
-
     @PostMapping("/login")
     private String adminLogin(@RequestParam(value = "adminID") String adminID,
                               @RequestParam(value = "password") String password,
                               HttpSession session) {
         Map<String, Object> map = adminService.adminLogin(adminID, password);
         if (Integer.parseInt(String.valueOf(map.get("code"))) == 1)
-            session.setAttribute(ConstantUtil.USER_SESSION_KEY, adminID);
+            session.setAttribute(ConstantUtil.ADMIN_SESSION_KEY, adminID);
         return JSONArray.toJSONString(map);
     }
 
     @PostMapping("/logout")
     private String adminLogout(HttpSession session) {
-        Map<String, Object> map = adminService.adminLogout((String) session.getAttribute(ConstantUtil.USER_SESSION_KEY));
-        if (map.get("code") == "1")
-            session.removeAttribute(ConstantUtil.USER_SESSION_KEY);
+        Map<String, Object> map = adminService.adminLogout((String) session.getAttribute(ConstantUtil.ADMIN_SESSION_KEY));
+        if (Integer.parseInt(String.valueOf(map.get("code"))) == 1)
+            session.removeAttribute(ConstantUtil.ADMIN_SESSION_KEY);
         return JSONArray.toJSONString(map);
     }
 }

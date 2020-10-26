@@ -9,15 +9,29 @@ public class MainConfiguration implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        InterceptorRegistration registration = registry.addInterceptor(new LoginHandlerInterception());
-        registration.addPathPatterns("/*.html");
-        registration.excludePathPatterns("/upload.html")
-                .excludePathPatterns("/studentLogin.html")
-                .excludePathPatterns("/adminLogin.html")
-                .excludePathPatterns("/studentRegister.html")
+        InterceptorRegistration loginRegistration = registry.addInterceptor(new LoginHandlerInterception());
+        InterceptorRegistration studentRegistration = registry.addInterceptor(new StudentHandlerInterception());
+        InterceptorRegistration adminRegistration = registry.addInterceptor(new AdminHandlerInterception());
+
+        loginRegistration.addPathPatterns("/**");
+        loginRegistration.excludePathPatterns("/error/*")
                 .excludePathPatterns("/js/axios.min.js")
                 .excludePathPatterns("/**/*.js")
-                .excludePathPatterns("/**/*.css");
+                .excludePathPatterns("/**/*.css")
+                .excludePathPatterns("/studentLogin.html")
+                .excludePathPatterns("/studentRegister.html")
+                .excludePathPatterns("/adminLogin.html")
+                .excludePathPatterns("/student/login")
+                .excludePathPatterns("/admin/login")
+                .excludePathPatterns("/student/register");
+
+        studentRegistration.addPathPatterns("/**");
+        studentRegistration.excludePathPatterns("/student/login")
+                .excludePathPatterns("/student/register");
+
+        adminRegistration.addPathPatterns("/adminLists.html")
+                .excludePathPatterns("/adminLogin.html")
+                .excludePathPatterns("/admin/login");
     }
 
     @Override
