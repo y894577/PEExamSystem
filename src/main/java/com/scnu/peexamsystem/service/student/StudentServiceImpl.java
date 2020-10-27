@@ -157,31 +157,33 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public Map<String, Object> uploadImg(MultipartFile file, String stuNo) throws Exception {
         Map<String, Object> map = new HashMap<>();
-        if (file.isEmpty()) {
+        if (file == null) {
             map.put("msg", "文件为空");
             map.put("code", -1);
-        }
-        //图片文件类型
-        String contentType = file.getContentType();
-        if (contentType != null && (contentType.equals("image/jpg") || contentType.equals("image/png") || contentType.equals("image/jpeg"))) {
-            long size = file.getSize() / 1024 / 1024;
-            if (size > fileMaxSize) {
-                map.put("msg", "图片大小不能超过" + fileMaxSize + "M");
-                map.put("code", -1);
+        }else {
+            //图片文件类型
+            String contentType = file.getContentType();
+            if (contentType != null && (contentType.equals("image/jpg") || contentType.equals("image/png") || contentType.equals("image/jpeg"))) {
+                long size = file.getSize() / 1024 / 1024;
+                if (size > fileMaxSize) {
+                    map.put("msg", "图片大小不能超过" + fileMaxSize + "M");
+                    map.put("code", -1);
+                } else {
+                    //图片后缀
+                    String suffix = file.getOriginalFilename().split("\\.")[1];
+                    //图片名字
+                    String newName = stuNo + "." + suffix;
+                    //上传文件工具类
+                    boolean isUpload = FileUtil.uploadFile(file.getBytes(), filePath + stuNo, "/" + newName);
+                    map.put("msg", "图片上传" + (isUpload ? "成功" : "失败"));
+                    map.put("code", isUpload ? 1 : 0);
+                }
             } else {
-                //图片后缀
-                String suffix = file.getOriginalFilename().split("\\.")[1];
-                //图片名字
-                String newName = stuNo + "." + suffix;
-                //上传文件工具类
-                boolean isUpload = FileUtil.uploadFile(file.getBytes(), filePath + stuNo, "/" + newName);
-                map.put("msg", "图片上传" + (isUpload ? "成功" : "失败"));
-                map.put("code", isUpload ? 1 : 0);
+                map.put("msg", "请上传jpg、png、jpeg格式的文件");
+                map.put("code", -1);
             }
-        } else {
-            map.put("msg", "请上传jpg、png、jpeg格式的文件");
-            map.put("code", -1);
         }
+
         return map;
     }
 

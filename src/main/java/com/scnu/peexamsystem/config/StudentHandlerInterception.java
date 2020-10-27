@@ -9,10 +9,6 @@ import javax.servlet.http.HttpServletResponse;
 public class StudentHandlerInterception implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-//        if(response.getStatus() == 404){
-//            response.sendRedirect("/error/404.html");
-//            return false;
-//        }
         Object status = request.getSession().getAttribute(ConstantUtil.STUDENT_SUBMIT_STATUS);
         String requestURI = request.getRequestURI();
         if (status != null) {

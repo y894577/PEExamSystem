@@ -1,5 +1,6 @@
 package com.scnu.peexamsystem.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.scnu.peexamsystem.entity.Student;
 import com.scnu.peexamsystem.service.student.StudentService;
@@ -13,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
+import javax.xml.bind.Element;
 import java.io.File;
 import java.util.Map;
 
@@ -27,6 +29,10 @@ public class StudentController {
 //        ModelAndView mv = new ModelAndView(viewName);
 //        return mv;
 //    }
+    @GetMapping("/getStuNo")
+    private String getStuNo(HttpSession session){
+        return session.getAttribute(ConstantUtil.USER_SESSION_KEY).toString();
+    }
 
     @GetMapping("/query/list")
     private String queryStudentList(@RequestParam(value = "queryStuName", required = false) String stuName,
@@ -80,11 +86,11 @@ public class StudentController {
     }
 
     @PostMapping("/submit")
-    private String submitApplication(Student student, HttpSession session) {
+    private String submitApplication(@RequestBody Student student, HttpSession session) {
         //需要验证发送请求方的session和实体类session是否一致
         //防止恶意提交
         //测试时加上session.getAttribute(ConstantUtil.USER_SESSION_KEY) == null，后期加入过滤器则删除
-        boolean isSession = session.getAttribute(ConstantUtil.USER_SESSION_KEY) == null || session.getAttribute("userSession").toString().equals(student.getStuNo());
+        boolean isSession = session.getAttribute("userSession").toString().equals(student.getStuNo());
         return JSONArray.toJSONString(studentService.submitApplication(student, isSession));
     }
 
@@ -96,21 +102,22 @@ public class StudentController {
     }
 
     @PostMapping("/upload")
-    private String uploadImage(@RequestParam("file") MultipartFile file, HttpSession session) throws Exception {
+    private String uploadImage(MultipartFile file, HttpSession session) throws Exception {
 
         String stuNo = session.getAttribute(ConstantUtil.USER_SESSION_KEY).toString();
+
         Map<String, Object> map = studentService.uploadImg(file, stuNo);
 
         return JSONArray.toJSONString(map);
     }
 
     @GetMapping("/showimg")
-    private ModelAndView showImg(@RequestParam("stuNo") String stuNo) {
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("index");
+    private String showImg(@RequestParam("stuNo") String stuNo) {
         File file = new File("src/main/resources/resources/uploadFile/" + stuNo);
         File[] files = file.listFiles();
-        modelAndView.getModel().put("filePath", "uploadFile/" + stuNo + "/" + files[0].getName());
-        return modelAndView;
+        if (files != null)
+            return  "/student/uploadFile/" + stuNo + "/" + files[0].getName();
+        else
+            return "";
     }
 }

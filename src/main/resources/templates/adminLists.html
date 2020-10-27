@@ -86,7 +86,7 @@
                         </el-table-column>
                         <el-table-column prop="stuName" label="姓名" min-width="120">
                         </el-table-column>
-                        <el-table-column  label="性别" min-width="80">
+                        <el-table-column label="性别" min-width="80">
                             <template slot-scope="scope">
                                 {{ genderLists[scope.row.gender].value }}
                             </template>
@@ -205,8 +205,8 @@
                 });
             },
             handleClick(row) {
+                window.open("adminDetail.html?stuNo=" + row.stuNo)
                 console.log(row);
-
             },
             handleSizeChange(val) {
                 app.pageSize = val;
@@ -246,17 +246,17 @@
                 statusLists: [{
                     value: '未通过',
                     status: '-1'
-                },{
+                }, {
                     value: '未审核',
                     status: '0'
-                },{
+                }, {
                     value: '已审核',
                     status: '1'
                 }],
                 genderLists: [{
                     value: '女',
                     status: '0'
-                },{
+                }, {
                     value: '男',
                     status: '1'
                 }],

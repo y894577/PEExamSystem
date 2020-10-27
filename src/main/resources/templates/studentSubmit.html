@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+
+<head>
+    <meta charset="UTF-8">
+    <title>submit</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 引入vue.js -->
+    <script src="js/vue.js" type="text/javascript" charset="utf-8"></script>
+    <!-- 引入element样式 -->
+    <link rel="stylesheet" href="css/index.css">
+    <!-- 引入element组件库 -->
+    <script src="js/index.js"></script>
+    <!-- 引入axios.js -->
+    <script src="js/axios.js"></script>
+</head>
+
+<div id="app">
+
+    <el-container>
+        <el-header style="background-color: #409EFF;color: #333;text-align: center;line-height: 60px;">
+            <div>
+                <div style="float: left;text-align: center;width:60%;margin-left: 20%;">表单提交</div>
+                <div style="text-align: right;">
+                    <el-button type="primary" @click="logout()">退出登录</el-button>
+                </div>
+            </div>
+        </el-header>
+        <el-main style="background-color: #E9EEF3;color: #333;">
+            <el-row :gutter="10" type="flex" justify="center">
+                <el-col :xs="24" :sm="22" :md="16" :lg="16" :xl="16">
+                    <div class="grid-content bg-purple-light">
+                        <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px"
+                                 class="demo-ruleForm">
+
+                            <el-form-item label="学号" prop="stuNo">
+                                <el-input v-model="ruleForm.stuNo" disabled style="width: 300px"></el-input>
+                            </el-form-item>
+
+                            <el-form-item label="姓名" prop="stuName">
+                                <el-input v-model="ruleForm.stuName" style="width: 300px"></el-input>
+                            </el-form-item>
+
+
+                            <el-form-item label="学院" prop="instituteNo">
+                                <el-select v-model="ruleForm.instituteNo" placeholder="请选择学院" @change="getClassLists()">
+                                    <el-option v-for="instituteNo in instituteLists" :key="instituteNo.instituteNo"
+                                               :label="instituteNo.instituteName"
+                                               :value="instituteNo.instituteNo"></el-option>
+                                </el-select>
+                            </el-form-item>
+
+
+                            <el-form-item label="年级" prop="grade">
+                                <el-select v-model=" ruleForm.grade" placeholder="请选择年级" @change="getClassLists()">
+                                    <el-option v-for="grade in gradeLists" :key="grade" :label="grade" :value="grade">
+                                    </el-option>
+                                </el-select>
+                            </el-form-item>
+
+                            <el-form-item label="班级" prop="classNo">
+                                <el-select v-model="ruleForm.classNo" placeholder="请选择班级"
+                                           @visible-change="getClassLists()">
+                                    <el-option v-for="item in classLists" :key="item.classNo" :label="item.className"
+                                               :value="item.classNo"></el-option>
+                                </el-select>
+                            </el-form-item>
+
+                            <el-form-item label="性别" prop="gender">
+                                <el-radio-group v-model="ruleForm.gender">
+                                    <el-radio label="男" :value="1"></el-radio>
+                                    <el-radio label="女" :value="0"></el-radio>
+                                </el-radio-group>
+                            </el-form-item>
+
+                            <el-form-item label="申请理由" prop="submitReason">
+                                <el-input type="textarea" v-model="ruleForm.submitReason"
+                                          style="width: 500px"></el-input>
+                            </el-form-item>
+
+                            <el-form-item label="医院证明" prop="medicalRecord" enctype="multipart/form-data">
+                                <el-upload name="medicalRecord" class="upload-demo" action=""
+                                           :on-preview="handlePreview" :on-remove="handleRemove"
+                                           :before-remove="beforeRemove"
+                                           accept="image/jpeg,image/png"
+                                           :http-request="imgChange" multiple :limit="1"
+                                           :on-exceed="handleExceed" :file-list="[]">
+                                    <el-button size="small" type="primary">点击上传</el-button>
+                                    <div slot="tip" class="el-upload__tip">上传单个文件</div>
+                                </el-upload>
+                            </el-form-item>
+
+                            <el-form-item>
+                                <el-button type="primary" @click="submitForm('ruleForm')">提交</el-button>
+                                <el-button @click="resetForm('ruleForm')">重置</el-button>
+                            </el-form-item>
+                        </el-form>
+                    </div>
+                </el-col>
+            </el-row>
+        </el-main>
+    </el-container>
+
+</div>
+</body>
+
+<script>
+    var Main = {
+
+        data() {
+            return {
+                instituteLists: [],
+                gradeLists: [],
+                classLists: [],
+                classDisabled: true,
+                ruleForm: {
+                    stuNo: '',
+                    gender: '',
+                    stuName: '',
+                    submitReason: '',
+                    instituteNo: '',
+                    grade: '',
+                    classNo: '',
+                    medicalRecord: [{name: '', url: ''}]
+                },
+                rules: {
+                    stuName: [
+                        {required: true, message: '请输入姓名', trigger: 'blur'},
+                        {
+                            required: true,
+                            trigger: 'blur',
+                            pattern: /^[\u4e00-\u9fa5]/,
+                            message: '请要输入汉字'
+                        }
+                    ],
+                    gender: [
+                        {required: true, message: '请选择性别', trigger: 'change'}
+                    ],
+                    instituteNo: [
+                        {required: true, message: '请选择学院', trigger: 'change'}
+                    ],
+                    grade: [
+                        {required: true, message: '请选择年级', trigger: 'change'}
+                    ],
+                    classNo: [
+                        {required: true, message: '请选择班级', trigger: 'change'}],
+                    submitReason: [
+                        {required: true, message: '请填写申请理由', trigger: 'blur'}
+                    ]
+                }
+            };
+        },
+
+        methods: {
+            getStuNo() {
+                axios({
+                    method: 'get',
+                    url: '/student/getStuNo'
+                }).then(function (response) {
+                    app.ruleForm.stuNo = response.data
+                }).catch(function (error) {
+                    console.log(error)
+                });
+            },
+            logout() {
+                axios({
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    transformRequest: [function (data) {
+                        let ret = ''
+                        for (let it in data) {
+                            ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&'
+                        }
+                        return ret
+                    }],
+                    method: 'post',
+                    url: '/student/logout',
+                }).then(function (response) {
+                    if (response.data.code === 1) {
+                        alert(response.data.msg);
+                        window.location.replace("studentLogin.html");
+                    } else {
+                        alert(response.data.msg);
+                    }
+                }).catch(function (error) {
+                    console.log(error)
+                });
+            },
+            getInstituteLists() {
+                axios({
+                    method: 'get',
+                    url: '/institute/query'
+                }).then(function (response) {
+                    console.log(response.data)
+                    if (response.data.code) {
+                        app.instituteLists = response.data.result;
+                    }
+                }).catch(function (error) {
+                    console.log(error)
+                });
+            },
+            getGradeLists() {
+                axios({
+                    method: 'get',
+                    url: '/class/query/grade'
+                }).then(function (response) {
+                    console.log(response.data)
+                    if (response.data.code === 1) {
+                        app.gradeLists = response.data.result;
+                    }
+                }).catch(function (error) {
+                    console.log(error)
+                });
+            },
+            getClassLists() {
+                app.classNo = '';
+                if (app.ruleForm.instituteNo !== '' && app.ruleForm.grade !== '') {
+                    axios({
+                        method: 'get',
+                        url: '/class/query/list',
+                        params: {
+                            instituteNo: app.ruleForm.instituteNo,
+                            grade: app.ruleForm.grade
+                        }
+                    }).then(function (response) {
+                        console.log(response.data)
+                        if (response.data.code === 1) {
+                            app.classLists = response.data.result;
+                        } else {
+                            console.log(response.data.msg);
+                        }
+                    }).catch(function (error) {
+                        console.log(error)
+                    });
+                    app.classDisabled = false;
+                } else {
+                    app.classDisabled = true;
+                }
+            },
+
+            submitForm(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        axios({
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            method: 'post',
+                            url: 'student/submit',
+                            data: {
+                                stuNo: app.ruleForm.stuNo,
+                                stuName: app.ruleForm.stuName,
+                                gender: app.ruleForm.gender === "男" ? 1 : 0,
+                                submitReason: app.ruleForm.submitReason,
+                                // medicalRecord: app.ruleForm.medicalRecord,
+                                instituteNo: app.ruleForm.instituteNo,
+                                classNo: app.ruleForm.classNo
+                            }
+                        })
+                            .then(function (response) {
+                                console.log(response.data)
+                                alert(response.data.msg)
+                            })
+                            .catch(function (error) {
+                                console.log(error)
+                            });
+                    } else {
+                        console.log('提交失败!');
+                        return false;
+                    }
+                });
+            },
+            resetForm(formName) {
+                this.$refs[formName].resetFields();
+            },
+            imgChange(file) {
+                let param = new FormData()
+                param.append('file', file.file)
+                axios({
+                    headers: {"Content-Type": "multipart/form-data"},
+                    method: 'post',
+                    url: '/student/upload',
+                    data: param
+                }).then(function (response) {
+                    alert(response.data.msg)
+                    console.log(response.data);
+                }).catch(function (error) {
+                    console.log(error)
+                });
+            },
+            uploadFile(formName) {
+                let formData = new FormData();
+                formData.append('file', formName.file);
+            },
+            handleRemove(file, fileList) {
+                console.log(file, fileList);
+            },
+            handlePreview(file) {
+                console.log(file);
+            },
+            handleExceed(files, fileList) {
+                this.$message.warning(`当前限制选择 1 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
+            },
+            beforeRemove(file, fileList) {
+                return this.$confirm(`确定移除 ${file.name}？`);
+            }
+        },
+        mounted: function () {
+            this.getInstituteLists();
+            this.getGradeLists();
+            this.getStuNo();
+        }
+    }
+    var Ctor = Vue.extend(Main)
+    var app = new Ctor().$mount('#app')
+    console.log(app);
+</script>
+
+</html>

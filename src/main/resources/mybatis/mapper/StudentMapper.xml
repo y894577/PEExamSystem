@@ -60,7 +60,12 @@
     </update>
 
     <select id="findStudentByStuNo" resultType="Student">
-        select * from student where stu_no = #{stuNo}
+        select stu.*, ins.institute_name, cla.class_name, cla.grade
+        from student as stu, institute as ins, class as cla
+         where stu.stu_no = #{stuNo}
+         and stu.institute_no = ins.institute_no
+         and ins.institute_no = cla.institute_no
+         and stu.class_no = cla.class_no
     </select>
 
     <update id="updateStudentVerifyStatus">
