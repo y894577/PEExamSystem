@@ -84,17 +84,24 @@
                     identify: ''
                 },
                 rules: {
-                    stuNo: [
-                        {required: true, message: '学号不能为空', trigger: 'blur'},
-                    ],
+					stuNo: [
+						{ required: true, message: '请输入学号', trigger: 'blur' },
+						{ required: true, min: 11, max: 11, message: '学号为11位', trigger: 'blur' },
+						{
+							required: true,
+							trigger: 'blur',
+							pattern: /^[0-9]*/,
+							message: '请输入数字'
+						}
+					],
                     password: [
                         {required: true, message: '密码不能为空', trigger: 'blur'},
-                        {min: 6, max: 18, message: '请输入6至18位数字', trigger: 'blur'},
+                        {min: 6, max: 18, message: '密码为6-18位', trigger: 'blur'},
                         {validator: validatePass, trigger: 'blur'},
                     ],
                     checkPass: [
                         {required: true, message: '确认密码不能为空', trigger: 'blur'},
-                        {min: 6, max: 18, message: '请输入6至18位数字', trigger: 'blur'},
+                        {min: 6, max: 18, message: '密码为6-18位', trigger: 'blur'},
                         {validator: validatePass2, trigger: 'blur'}
                     ]
                 }
