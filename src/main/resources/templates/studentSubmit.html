@@ -130,7 +130,7 @@
                             required: true,
                             trigger: 'blur',
                             pattern: /^[\u4e00-\u9fa5]/,
-                            message: '请要输入汉字'
+                            message: '请输入汉字'
                         }
                     ],
                     gender: [
@@ -247,7 +247,7 @@
                                 'Content-Type': 'application/json'
                             },
                             method: 'post',
-                            url: 'student/submit',
+                            url: '/student/submit',
                             data: {
                                 stuNo: app.ruleForm.stuNo,
                                 stuName: app.ruleForm.stuName,
