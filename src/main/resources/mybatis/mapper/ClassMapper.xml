@@ -5,7 +5,9 @@
 <mapper namespace="com.scnu.peexamsystem.dao.classes.ClassDao">
 
     <select id="findAllByInstituteNoAndGrade" resultType="com.scnu.peexamsystem.entity.Class">
-        select * from class where institute_no = #{instituteNo} and grade = #{grade};
+        select * from class
+        where institute_no = #{instituteNo} and grade = #{grade}
+        order by class_no asc;
     </select>
 
 </mapper>

@@ -52,7 +52,6 @@
             <if test="stuName != ''">stu_name = #{stuName},</if>
             <if test="gender == 0 || gender == 1">gender = #{gender},</if>
             <if test="submitReason != ''">submit_reason = #{submitReason},</if>
-            <if test="medicalRecord != ''">medical_record = #{medicalRecord},</if>
             <if test="instituteNo != ''">institute_no = #{instituteNo},</if>
             <if test="classNo != ''">class_no = #{classNo}</if>
         </set>

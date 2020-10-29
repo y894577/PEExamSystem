@@ -7,6 +7,7 @@ import com.scnu.peexamsystem.service.student.StudentService;
 import com.scnu.peexamsystem.util.ConstantUtil;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,13 +25,11 @@ public class StudentController {
     @Autowired
     StudentService studentService;
 
-//    @RequestMapping("/{viewName}.html")
-//    private ModelAndView student(@PathVariable String viewName) {
-//        ModelAndView mv = new ModelAndView(viewName);
-//        return mv;
-//    }
+    @Value("${upload.file.path}")
+    private String filePath;
+
     @GetMapping("/getStuNo")
-    private String getStuNo(HttpSession session){
+    private String getStuNo(HttpSession session) {
         return session.getAttribute(ConstantUtil.USER_SESSION_KEY).toString();
     }
 
@@ -76,10 +75,12 @@ public class StudentController {
     }
 
     @PostMapping("/logout")
-    private String studentLogout(HttpSession session,
-                                 @RequestParam(value = "stuNo") String stuNo) {
+    private String studentLogout(HttpSession session) {
+        String stuNo = session.getAttribute(ConstantUtil.USER_SESSION_KEY).toString();
         session.removeAttribute(ConstantUtil.USER_SESSION_KEY);
-        boolean isRemoveSession = session.getAttribute(ConstantUtil.USER_SESSION_KEY) == null;
+        session.removeAttribute(ConstantUtil.STUDENT_SUBMIT_STATUS);
+        boolean isRemoveSession = session.getAttribute(ConstantUtil.USER_SESSION_KEY) == null
+                && session.getAttribute(ConstantUtil.STUDENT_SUBMIT_STATUS) == null;
         Map<String, Object> map = studentService.studentLogout(isRemoveSession, stuNo);
 
         return JSONArray.toJSONString(map);
@@ -90,8 +91,13 @@ public class StudentController {
         //需要验证发送请求方的session和实体类session是否一致
         //防止恶意提交
         //测试时加上session.getAttribute(ConstantUtil.USER_SESSION_KEY) == null，后期加入过滤器则删除
-        boolean isSession = session.getAttribute("userSession").toString().equals(student.getStuNo());
-        return JSONArray.toJSONString(studentService.submitApplication(student, isSession));
+        boolean isSession = session.getAttribute(ConstantUtil.USER_SESSION_KEY).toString().equals(student.getStuNo());
+        Map<String, Object> map = studentService.submitApplication(student, isSession);
+        if (Integer.parseInt(String.valueOf(map.get("code"))) == 1) {
+            session.setAttribute(ConstantUtil.USER_SESSION_KEY, student.getStuNo());
+            session.setAttribute(ConstantUtil.STUDENT_SUBMIT_STATUS, true);
+        }
+        return JSONArray.toJSONString(map);
     }
 
     @PostMapping("/verify")
@@ -113,10 +119,10 @@ public class StudentController {
 
     @GetMapping("/showimg")
     private String showImg(@RequestParam("stuNo") String stuNo) {
-        File file = new File("src/main/resources/resources/uploadFile/" + stuNo);
+        File file = new File(filePath + stuNo);
         File[] files = file.listFiles();
         if (files != null)
-            return  "/student/uploadFile/" + stuNo + "/" + files[0].getName();
+            return "/student/uploadFile/" + stuNo + "/" + files[0].getName();
         else
             return "";
     }

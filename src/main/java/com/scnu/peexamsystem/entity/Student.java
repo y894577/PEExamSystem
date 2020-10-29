@@ -17,7 +17,6 @@ public class Student {
 
     //额外信息
     private String submitReason;
-    private String medicalRecord;
 
     //状态信息
     private Integer verifyStatus;
@@ -74,14 +73,6 @@ public class Student {
 
     public void setSubmitReason(String submitReason) {
         this.submitReason = submitReason;
-    }
-
-    public String getMedicalRecord() {
-        return medicalRecord;
-    }
-
-    public void setMedicalRecord(String medicalRecord) {
-        this.medicalRecord = medicalRecord;
     }
 
     public Integer getVerifyStatus() {

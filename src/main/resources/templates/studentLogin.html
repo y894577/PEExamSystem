@@ -12,6 +12,7 @@
     <script src="js/index.js"></script>
     <!-- 引入axios.js -->
     <script src="js/axios.min.js"></script>
+    <script> Vue.config.productionTip = false</script>
 </head>
 
 <body>
@@ -33,12 +34,10 @@
                 <el-form-item label="密码" prop="password">
                     <el-input type="password" v-model="ruleForm.password" autocomplete="off" id="passwd"
                               style="width: 200px"></el-input>
-
-                    <p></p>
-                    <el-form-item>
-                        <el-button type="primary" @click="submitForm('ruleForm')">登录</el-button>
-                        <el-button @click="resetForm('ruleForm')">重置</el-button>
-                    </el-form-item>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="submitForm('ruleForm')">登录</el-button>
+                    <el-button @click="resetForm('ruleForm')">重置</el-button>
                 </el-form-item>
             </el-form>
         </div>
@@ -180,7 +179,7 @@
                                     type: 'success'
                                 });
                                 if (response.data.submit === true)
-                                    window.location.replace('studentSubmit.html');
+                                    window.location.replace('studentDetail.html');
                                 else
                                     window.location.replace('studentSubmit.html');
                             } else {
@@ -204,8 +203,6 @@
     }
     var Ctor = Vue.extend(Main)
     var app = new Ctor().$mount('#app')
-    console.log(app);
-
 </script>
 
 </html>

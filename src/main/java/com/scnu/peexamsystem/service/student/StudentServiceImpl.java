@@ -84,7 +84,7 @@ public class StudentServiceImpl implements StudentService {
         Map<String, Object> result = new HashMap<>();
         result.put("stuNo", stuNo);
         if (isLogin)
-            map.put("submit", !StringUtils.isEmpty(student.getSubmitReason()));
+            map.put("submit", student.getSubmitReason() != null);
         map.put("result", result);
         map.put("code", isLogin ? 1 : 0);
         return map;
@@ -160,7 +160,7 @@ public class StudentServiceImpl implements StudentService {
         if (file == null) {
             map.put("msg", "文件为空");
             map.put("code", -1);
-        }else {
+        } else {
             //图片文件类型
             String contentType = file.getContentType();
             if (contentType != null && (contentType.equals("image/jpg") || contentType.equals("image/png") || contentType.equals("image/jpeg"))) {

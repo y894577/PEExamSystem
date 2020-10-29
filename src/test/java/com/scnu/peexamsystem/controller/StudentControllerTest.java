@@ -34,7 +34,7 @@ class StudentControllerTest {
     private HttpEntity<MultiValueMap<String, Object>> request;
     private MultiValueMap<String, Object> postMap = new LinkedMultiValueMap<>();
     private Map<String, Object> getMap = new HashMap<>();
-    private final String basicUrl = "http://localhost:8001/student";
+    private final String basicUrl = "http://119.29.166.127:8001/student";
     private String url;
     private String method;
 
@@ -89,17 +89,17 @@ class StudentControllerTest {
 
     @Test
     public void queryStudentList() {
-        url = "/query/list?queryStatus={queryStatus}&currentPageNo={currentPageNo}&pageSize={pageSize}";
-        postMap.add("queryStatus", "1");
-        postMap.add("currentPageNo", 1);
-        postMap.add("pageSize", 10);
+        url = "/query/list?currentPageNo={currentPageNo}&pageSize={pageSize}";
+        getMap.put("queryStatus", "1");
+        getMap.put("currentPageNo", 1);
+        getMap.put("pageSize", 10);
         method = "get";
     }
 
     @Test
     public void studentLogin() {
         url = "/login";
-        postMap.add("stuNo", "20182005001");
+        postMap.add("stuNo", "20182005005");
         postMap.add("password", "123456");
         method = "post";
     }
@@ -107,20 +107,20 @@ class StudentControllerTest {
     @Test
     public void studentRegister() {
         url = "/register";
-        postMap.add("stuNo", "20182005003");
+        postMap.add("stuNo", "20182005005");
         postMap.add("password", "123456");
         method = "post";
     }
 
     @Test
-    public void studentLogout(){
+    public void studentLogout() {
         url = "/logout";
         postMap.add("stuNo", "20182005001");
         method = "post";
     }
 
     @Test
-    public void submitApplication(){
+    public void submitApplication() {
         url = "/submit";
         Student student = new Student();
         student.setStuNo("20182005004");
@@ -129,7 +129,6 @@ class StudentControllerTest {
         student.setInstituteNo("RJXY");
         student.setClassNo("RJGC1805");
         student.setSubmitReason("不知道");
-        student.setMedicalRecord("aaaa");
         postMap.add("student", student);
         method = "post";
     }

@@ -1,0 +1,1 @@
+INSERT INTO exam_free_db.admin (admin_id, admin_name, password) VALUES ('admin', 'admin', 'e10adc3949ba59abbe56e057f20f883e');

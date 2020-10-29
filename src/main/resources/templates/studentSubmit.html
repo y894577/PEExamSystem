@@ -1,10 +1,8 @@
-<!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/html">
-
+﻿<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>submit</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit</title>
     <!-- 引入vue.js -->
     <script src="js/vue.js" type="text/javascript" charset="utf-8"></script>
     <!-- 引入element样式 -->
@@ -12,7 +10,8 @@
     <!-- 引入element组件库 -->
     <script src="js/index.js"></script>
     <!-- 引入axios.js -->
-    <script src="js/axios.js"></script>
+    <script src="js/axios.min.js"></script>
+    <script> Vue.config.productionTip = false</script>
 </head>
 
 <div id="app">
@@ -34,7 +33,7 @@
                                  class="demo-ruleForm">
 
                             <el-form-item label="学号" prop="stuNo">
-                                <el-input v-model="ruleForm.stuNo" disabled style="width: 300px"></el-input>
+                                <el-input v-model="ruleForm.stuNo" readonly disabled style="width: 300px"></el-input>
                             </el-form-item>
 
                             <el-form-item label="姓名" prop="stuName">
@@ -78,8 +77,9 @@
                                           style="width: 500px"></el-input>
                             </el-form-item>
 
-                            <el-form-item label="医院证明" prop="medicalRecord" enctype="multipart/form-data">
-                                <el-upload name="medicalRecord" class="upload-demo" action=""
+
+                            <el-form-item label="医院证明" prop="medicalRecord">
+                                <el-upload name="medicalRecord" class="upload-demo" action="" style="width: 250px"
                                            :on-preview="handlePreview" :on-remove="handleRemove"
                                            :before-remove="beforeRemove"
                                            accept="image/jpeg,image/png"
@@ -92,7 +92,7 @@
 
                             <el-form-item>
                                 <el-button type="primary" @click="submitForm('ruleForm')">提交</el-button>
-                                <el-button @click="resetForm('ruleForm')">重置</el-button>
+<!--                                <el-button @click="resetForm('ruleForm')">重置</el-button>-->
                             </el-form-item>
                         </el-form>
                     </div>
@@ -113,6 +113,7 @@
                 gradeLists: [],
                 classLists: [],
                 classDisabled: true,
+                isUploadImg: false,
                 ruleForm: {
                     stuNo: '',
                     gender: '',
@@ -126,12 +127,6 @@
                 rules: {
                     stuName: [
                         {required: true, message: '请输入姓名', trigger: 'blur'},
-                        {
-                            required: true,
-                            trigger: 'blur',
-                            pattern: /^[\u4e00-\u9fa5]/,
-                            message: '请要输入汉字'
-                        }
                     ],
                     gender: [
                         {required: true, message: '请选择性别', trigger: 'change'}
@@ -146,7 +141,7 @@
                         {required: true, message: '请选择班级', trigger: 'change'}],
                     submitReason: [
                         {required: true, message: '请填写申请理由', trigger: 'blur'}
-                    ]
+                    ],
                 }
             };
         },
@@ -240,36 +235,42 @@
             },
 
             submitForm(formName) {
-                this.$refs[formName].validate((valid) => {
-                    if (valid) {
-                        axios({
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            method: 'post',
-                            url: 'student/submit',
-                            data: {
-                                stuNo: app.ruleForm.stuNo,
-                                stuName: app.ruleForm.stuName,
-                                gender: app.ruleForm.gender === "男" ? 1 : 0,
-                                submitReason: app.ruleForm.submitReason,
-                                // medicalRecord: app.ruleForm.medicalRecord,
-                                instituteNo: app.ruleForm.instituteNo,
-                                classNo: app.ruleForm.classNo
-                            }
-                        })
-                            .then(function (response) {
-                                console.log(response.data)
-                                alert(response.data.msg)
+                if (app.isUploadImg) {
+                    this.$refs[formName].validate((valid) => {
+                        if (valid) {
+                            axios({
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                method: 'post',
+                                url: 'student/submit',
+                                data: {
+                                    stuNo: app.ruleForm.stuNo,
+                                    stuName: app.ruleForm.stuName,
+                                    gender: app.ruleForm.gender === "男" ? 1 : 0,
+                                    submitReason: app.ruleForm.submitReason,
+                                    // medicalRecord: app.ruleForm.medicalRecord,
+                                    instituteNo: app.ruleForm.instituteNo,
+                                    classNo: app.ruleForm.classNo
+                                }
                             })
-                            .catch(function (error) {
-                                console.log(error)
-                            });
-                    } else {
-                        console.log('提交失败!');
-                        return false;
-                    }
-                });
+                                .then(function (response) {
+                                    alert(response.data.msg)
+                                    if (response.data.code === 1) {
+                                        window.location.replace("studentDetail.html");
+                                    }
+                                })
+                                .catch(function (error) {
+                                    console.log(error)
+                                });
+                        } else {
+                            console.log('提交失败!');
+                            return false;
+                        }
+                    });
+                } else {
+                    alert("还未上传证明材料！")
+                }
             },
             resetForm(formName) {
                 this.$refs[formName].resetFields();
@@ -285,6 +286,8 @@
                 }).then(function (response) {
                     alert(response.data.msg)
                     console.log(response.data);
+                    if (response.data.code === 1)
+                        app.isUploadImg = true;
                 }).catch(function (error) {
                     console.log(error)
                 });
@@ -314,7 +317,6 @@
     }
     var Ctor = Vue.extend(Main)
     var app = new Ctor().$mount('#app')
-    console.log(app);
 </script>
 
 </html>

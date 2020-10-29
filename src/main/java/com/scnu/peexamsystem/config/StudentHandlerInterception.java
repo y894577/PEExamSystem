@@ -9,18 +9,16 @@ import javax.servlet.http.HttpServletResponse;
 public class StudentHandlerInterception implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        Object student = request.getSession().getAttribute(ConstantUtil.USER_SESSION_KEY);
         Object status = request.getSession().getAttribute(ConstantUtil.STUDENT_SUBMIT_STATUS);
         String requestURI = request.getRequestURI();
-        if (status != null) {
-            if ((boolean) status && requestURI.equals("/index.html"))
-                return true;
-            else if (!(boolean) status && requestURI.equals("/upload.html"))
-                return true;
-            else
+        if (student != null && status != null) {
+            if (!(boolean) status && requestURI.equals("/studentDetail.html"))
                 return false;
-        } else {
-            return true;
+            else if ((boolean) status && requestURI.equals("/studentSubmit.html"))
+                return false;
         }
+        return true;
     }
 }
 

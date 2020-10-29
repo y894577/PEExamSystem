@@ -2,8 +2,9 @@
 <html>
 
 <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta charset="utf-8"/>
-    <title>管理员审核界面</title>
+    <title>学生查看界面</title>
     <!-- 引入vue.js -->
     <script src="js/vue.js" type="text/javascript" charset="utf-8"></script>
     <!-- 引入element样式 -->
@@ -21,7 +22,7 @@
         <el-header style="background-color: #409EFF;color: #333;text-align: center;line-height: 60px;">
 
             <div>
-                <div style="float: left;text-align: center;width:40%;margin-left: 30%;">管理员审核界面</div>
+                <div style="float: left;text-align: center;width:40%;margin-left: 30%;">学生详情界面</div>
                 <div style="text-align: right;">
                     <el-button type="primary" @click="logout()" :size="buttonSize">退出登录</el-button>
                 </div>
@@ -79,7 +80,7 @@
                         </el-col>
                     </el-row>
                     <el-form-item label="申请理由:">
-                        <el-input type="textarea" autosize v-model="form.submitReason" readonly ></el-input>
+                        <el-input type="textarea" autosize v-model="form.submitReason" readonly></el-input>
                     </el-form-item>
 
                     <div style="width: 200px;margin: auto;padding-bottom: 20px">
@@ -108,23 +109,9 @@
                         <div class="block" style="width: 100%;">
 
                             <img :src="src" style="width: 500px">
-                            <!--                                    <div slot="placeholder" class="image-slot">-->
-                            <!--                                        加载中<span class="dot">...</span>-->
-                            <!--                                    </div>-->
                             </img>
                         </div>
                     </el-form-item>
-
-                    <div style="text-align: center;margin-left: 0;">
-                        <el-form-item label-width="0">
-                            <el-button v-if="form.verifyStatus == 0 || form.verifyStatus == 1" type="danger"
-                                       @click="reject()">驳回审核
-                            </el-button>
-                            <el-button v-if="form.verifyStatus == 0 || form.verifyStatus == -1" type="primary"
-                                       @click="pass()">通过审核
-                            </el-button>
-                        </el-form-item>
-                    </div>
 
                 </el-form>
             </div>
@@ -138,20 +125,32 @@
 </body>
 <script>
     // 处理url参数
-    function getQueryVariable(variable) {
-        var query = window.location.search.substring(1);
-        var vars = query.split("&");
-        for (var i = 0; i < vars.length; i++) {
-            var pair = vars[i].split("=");
-            if (pair[0] === variable) {
-                return pair[1];
-            }
-        }
-        return false;
-    }
+    // function getQueryVariable(variable) {
+    //     var query = window.location.search.substring(1);
+    //     var vars = query.split("&");
+    //     for (var i = 0; i < vars.length; i++) {
+    //         var pair = vars[i].split("=");
+    //         if (pair[0] === variable) {
+    //             return pair[1];
+    //         }
+    //     }
+    //     return (false);
+    // }
 
     var Main = {
         methods: {
+            getStuNo() {
+                let that = this
+                axios({
+                    method: 'get',
+                    url: '/student/getStuNo'
+                }).then(function (response) {
+                    that.stuNo = response.data
+                    that.getDetail(that.stuNo)
+                }).catch(function (error) {
+                    console.log(error)
+                });
+            },
             logout() {
                 axios({
                     headers: {
@@ -165,7 +164,7 @@
                         return ret
                     }],
                     method: 'post',
-                    url: '/admin/logout',
+                    url: '/student/logout',
                 }).then(function (response) {
                     if (response.data.code === 1) {
                         alert(response.data.msg);
@@ -178,11 +177,13 @@
                 });
             },
             getDetail(sn) {
+                let that = this
+                console.log(that.stuNo)
                 axios({
                     method: 'get',
                     url: '/student/query/single',
                     params: {
-                        stuNo: sn
+                        stuNo: that.stuNo
                     }
                 }).then(function (response) {
                     console.log(response.data)
@@ -212,63 +213,8 @@
                     console.log(error)
                 });
             },
-            verify(st, sn) {
-                axios({
-                    method: 'post',
-                    url: '/student/verify',
-                    params: {
-                        stuNo: sn,
-                        status: st
-                    }
-                }).then(function (response) {
-                    console.log(response.data)
-                    if (response.data.code === 1) {
-                        app.$message({
-                            type: 'success',
-                            message: '修改成功!'
-                        });
-                        app.form.verifyStatus = st;
-                    } else {
-                        app.$message.error({
-                            message: response.data.msg
-                        });
-                    }
-                }).catch(function (error) {
-                    console.log(error)
-                });
-            },
-            pass() {
-                this.$confirm('是否通过审核?', '提示', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    type: 'warning'
-                }).then(() => {
-                    //审核通过
-                    app.verify(1, app.stuNo)
-                }).catch(() => {
-                    this.$message({
-                        type: 'info',
-                        message: '已取消审核'
-                    });
-                });
-            },
-            reject() {
-                this.$confirm('是否驳回审核?', '提示', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    type: 'warning'
-                }).then(() => {
-                    app.verify(-1, app.stuNo);
-                }).catch(() => {
-                    this.$message({
-                        type: 'info',
-                        message: '已取消审核'
-                    });
-                });
-            }
         },
         data() {
-
             return {
                 stuNo: '',
                 src: '',
@@ -296,9 +242,8 @@
                 }],
             }
         },
-        mounted: function () {
-            this.stuNo = getQueryVariable('stuNo');
-            this.getDetail(this.stuNo);
+        mounted: async function () {
+            await this.getStuNo();
         }
     }
     var Ctor = Vue.extend(Main)

@@ -13,12 +13,21 @@
     <script src="js/index.js"></script>
     <!-- 引入axios.js -->
     <script src="js/axios.min.js"></script>
+    <script> Vue.config.productionTip = false</script>
 </head>
 
 <body>
 <div id="app" style="margin-bottom: 40px;">
     <el-container>
-        <el-header style="background-color: #409EFF;color: #333;text-align: center;line-height: 60px;">查询列表
+        <el-header style="background-color: #409EFF;color: #333;text-align: center;line-height: 60px;">
+
+            <div>
+                <div style="float: left;text-align: center;width:40%;margin-left: 30%;">查询列表</div>
+                <div style="text-align: right;">
+                    <el-button type="primary" @click="logout()">退出登录</el-button>
+                </div>
+            </div>
+
         </el-header>
         <el-main style="background-color: #E9EEF3;color: #333;text-align: center;">
             <el-row :gutter="10" style="height: 60px;">
@@ -128,7 +137,31 @@
 </body>
 <script>
     var Main = {
-        methods: {
+        methods: {logout() {
+                axios({
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    transformRequest: [function (data) {
+                        let ret = ''
+                        for (let it in data) {
+                            ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&'
+                        }
+                        return ret
+                    }],
+                    method: 'post',
+                    url: '/admin/logout',
+                }).then(function (response) {
+                    if (response.data.code === 1) {
+                        alert(response.data.msg);
+                        location.reload();
+                    } else {
+                        alert(response.data.msg);
+                    }
+                }).catch(function (error) {
+                    console.log(error)
+                });
+            },
             getInstituteLists() {
                 axios({
                     method: 'get',
@@ -148,7 +181,7 @@
                     url: '/class/query/grade'
                 }).then(function (response) {
                     console.log(response.data)
-                    if (response.data.code == 1) {
+                    if (response.data.code === 1) {
                         app.gradeLists = response.data.result;
                     }
                 }).catch(function (error) {
@@ -198,6 +231,7 @@
                     console.log(response.data)
                     if (response.data.code === 1) {
                         app.tableData = response.data.result;
+                        app.totalNum = response.data.page.totalNum;
                     }
                     app.loading = false;
                 }).catch(function (error) {
@@ -210,9 +244,12 @@
             },
             handleSizeChange(val) {
                 app.pageSize = val;
+                this.loadList();
                 console.log(`每页 ${val} 条`);
             },
             handleCurrentChange(val) {
+                app.currentPage = val;
+                this.loadList()
                 console.log(`当前第: ${val} 页`);
             }
         },
@@ -272,7 +309,6 @@
     }
     var Ctor = Vue.extend(Main)
     var app = new Ctor().$mount('#app')
-    console.log(app);
 </script>
 
 </html>
