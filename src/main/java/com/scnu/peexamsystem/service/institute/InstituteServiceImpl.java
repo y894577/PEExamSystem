@@ -9,11 +9,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author Magic Gunner
+ * @version 1.0
+ */
 @Service
 public class InstituteServiceImpl implements InstituteService {
     @Autowired
     InstituteDao instituteDao;
 
+    /**
+     * 获取学院列表
+     * @return msg 返回消息
+     *         code 状态码，1成功，0失败
+     *         result 学院列表
+     */
     @Override
     public Map<String, Object> queryInstituteList() {
         Map<String, Object> map = new HashMap<>();

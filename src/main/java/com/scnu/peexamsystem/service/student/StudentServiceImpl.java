@@ -17,6 +17,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author Magic Gunner
+ * @version 1.0
+ */
 @Service
 public class StudentServiceImpl implements StudentService {
     @Autowired
@@ -27,10 +31,22 @@ public class StudentServiceImpl implements StudentService {
     @Value("${upload.file.size}")
     private int fileMaxSize;
 
+    /**
+     * 查询学生列表
+     * @param stuName 学生姓名
+     * @param instituteNo 学院号
+     * @param classNo 班级号
+     * @param grade 年级
+     * @param status 审核状态
+     * @param currentPageNo 当前页标
+     * @param pageSize 每一页展示条目数
+     * @return msg 返回消息
+     *         code 状态码，1成功，0失败
+     *         result 查询列表
+     */
     @Override
     public Map<String, Object> queryStudentList(String stuName, String instituteNo, String classNo, String grade, String status,
                                                 int currentPageNo, int pageSize) {
-
         Map<String, Object> map = new HashMap<>();
 
         if (!StringUtils.isEmpty(stuName))
@@ -44,14 +60,12 @@ public class StudentServiceImpl implements StudentService {
             }
         });
 
-
         Map<String, Object> page = new HashMap<>();
         page.put("currentPageNo", currentPageNo);
         page.put("totalPage", pageInfo.getPageNum());
         page.put("totalNum", pageInfo.getTotal());
         page.put("currentNum", pageInfo.getSize());
         map.put("page", page);
-
 
         List<Student> list = pageInfo.getList();
         map.put("msg", "查询学生列表成功");
@@ -61,6 +75,13 @@ public class StudentServiceImpl implements StudentService {
         return map;
     }
 
+    /**
+     * 通过学号查询单个学生
+     * @param stuNo 学号
+     * @return msg 返回消息
+     *         code 状态码，1成功，0失败
+     *         result 学生实体
+     */
     @Override
     public Map<String, Object> queryStudent(String stuNo) {
         Map<String, Object> map = new HashMap<>();
@@ -74,6 +95,14 @@ public class StudentServiceImpl implements StudentService {
         return map;
     }
 
+    /**
+     * 学生登录，通过stuNo和password查询是否存在该学生
+     * @param stuNo 学号
+     * @param password 密码
+     * @return msg 返回消息
+     *         code 状态码，1成功，0失败
+     *         result boolean是否登录成功
+     */
     @Override
     public Map<String, Object> studentLogin(String stuNo, String password) {
         Map<String, Object> map = new HashMap<>();
@@ -90,6 +119,13 @@ public class StudentServiceImpl implements StudentService {
         return map;
     }
 
+    /**
+     * 学生注册
+     * @param stuNo 学号
+     * @param password 密码
+     * @return msg 返回消息
+     *         code 1成功，0失败，-1已存在该用户
+     */
     @Override
     public Map<String, Object> registerStudent(String stuNo, String password) {
         Map<String, Object> map = new HashMap<>();
@@ -112,6 +148,14 @@ public class StudentServiceImpl implements StudentService {
         return map;
     }
 
+    /**
+     * 学生退出登录
+     * @param isRemoveSession 是否移除session
+     * @param stuNo 学号
+     * @return msg 返回消息
+     *         code 状态码，1成功，0失败
+     *         result 学号stuNo
+     */
     @Override
     public Map<String, Object> studentLogout(boolean isRemoveSession, String stuNo) {
         Map<String, Object> map = new HashMap<>();
@@ -125,6 +169,14 @@ public class StudentServiceImpl implements StudentService {
         return map;
     }
 
+    /**
+     * 学生提交申请
+     * @param student 学生实体
+     * @param isSession 提交请求stuNo和session是否一致
+     * @return msg 返回消息
+     *         code 状态码，1成功，0失败
+     *         result 学生实体
+     */
     @Override
     public Map<String, Object> submitApplication(Student student, boolean isSession) {
         Map<String, Object> map = new HashMap<>();
@@ -138,22 +190,38 @@ public class StudentServiceImpl implements StudentService {
         return map;
     }
 
+    /**
+     * 修改审核状态
+     * @param status 审核状态
+     * @param stuNo 学号
+     * @return msg 返回消息
+     *         code 状态码，1成功，0失败
+     *         result stuNo 学号，status 审核状态
+     */
     @Override
     public Map<String, Object> modifyStatus(String status, String stuNo) {
         Map<String, Object> map = new HashMap<>();
 
         boolean isUpdate = studentDao.updateStudentVerifyStatus(status, stuNo) > 0;
         map.put("msg", "修改" + (isUpdate ? "成功" : "失败"));
+        map.put("code", isUpdate ? 1 : 0);
 
         Map<String, Object> result = new HashMap<>();
         result.put("stuNo", stuNo);
         result.put("status", status);
         map.put("result", result);
 
-        map.put("code", isUpdate ? 1 : 0);
         return map;
     }
 
+
+    /**
+     * 上传图片文件
+     * @param file 图片文件
+     * @param stuNo 学号
+     * @return msg 返回消息
+     *         code 状态码，1成功，0失败，-1格式大小有误
+     */
     @Override
     public Map<String, Object> uploadImg(MultipartFile file, String stuNo) throws Exception {
         Map<String, Object> map = new HashMap<>();

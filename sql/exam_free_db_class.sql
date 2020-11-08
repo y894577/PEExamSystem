@@ -89,3 +89,6 @@ INSERT INTO exam_free_db.class (class_no, class_name, grade, institute_no) VALUE
 INSERT INTO exam_free_db.class (class_no, class_name, grade, institute_no) VALUES ('WLGC2002', '网络工程（师范）2班', '2020', 'ZYJYXY');
 INSERT INTO exam_free_db.class (class_no, class_name, grade, institute_no) VALUES ('WLGC2003', '网络工程（师范）3班', '2020', 'ZYJYXY');
 INSERT INTO exam_free_db.class (class_no, class_name, grade, institute_no) VALUES ('WLGC2004', '网络工程（师范）4班', '2020', 'ZYJYXY');
+INSERT INTO exam_free_db.class (class_no, class_name, grade, institute_no) VALUES ('DZSW2001', '电子商务中澳班', '2020', 'JJGLXY');
+INSERT INTO exam_free_db.class (class_no, class_name, grade, institute_no) VALUES ('JRGC1901', '金融工程中英班', '2019', 'JJGLXY');
+INSERT INTO exam_free_db.class (class_no, class_name, grade, institute_no) VALUES ('JRGC2001', '金融工程中英班', '2020', 'JJGLXY');

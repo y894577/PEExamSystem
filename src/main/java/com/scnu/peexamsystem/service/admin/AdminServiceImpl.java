@@ -10,13 +10,23 @@ import org.springframework.util.DigestUtils;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author Magic Gunner
+ * version 1.0
+ */
 @Service
 public class AdminServiceImpl implements AdminService {
-
     @Autowired
     AdminDao adminDao;
 
-
+    /**
+     * 管理员登录
+     * @param adminID 管理员id
+     * @param password 密码
+     * @return msg 返回消息
+     *         code 状态码，1成功，0失败
+     *         result boolean是否登录成功
+     */
     @Override
     public Map<String, Object> adminLogin(String adminID, String password) {
         String pwd = DigestUtils.md5DigestAsHex(password.getBytes());
@@ -35,6 +45,13 @@ public class AdminServiceImpl implements AdminService {
         return map;
     }
 
+    /**
+     * 管理员退出登录
+     * @param adminID 管理员id
+     * @return msg 返回消息
+     *         code 状态码，1成功，0失败
+     *         result boolean是否退出登录成功
+     */
     @Override
     public Map<String, Object> adminLogout(String adminID) {
         Map<String, Object> map = new HashMap<>();

@@ -34,30 +34,30 @@
             <div style="width: 70%;margin: auto">
                 <el-form ref="form" :model="form" label-position="right" label-width="80px">
                     <el-row :gutter="1">
-                        <el-col :span="12" :xs="24">
+                        <el-col :span="10" :xs="24">
                             <div>
                                 <el-form-item label="学号:">
                                     <el-input v-model="form.stuNo" readonly></el-input>
                                 </el-form-item>
                             </div>
                         </el-col>
-                        <el-col :span="12" :xs="24">
+                        <el-col :span="10" :xs="24">
                             <div>
                                 <el-form-item label="姓名:">
                                     <el-input v-model="form.stuName" readonly></el-input>
                                 </el-form-item>
                             </div>
                         </el-col>
-                    </el-row>
-                    <el-row :gutter="1">
-                        <el-col :md="6" :xs="24" :sm="12">
+                        <el-col :md="4" :xs="24" :sm="12">
                             <div>
                                 <el-form-item label="性别:">
                                     <el-input v-model="genderLists[form.gender].value" readonly></el-input>
                                 </el-form-item>
                             </div>
                         </el-col>
-                        <el-col :md="6" :xs="24" :sm="12">
+                    </el-row>
+                    <el-row :gutter="1">
+                        <el-col :md="9" :xs="24" :sm="12">
                             <div>
                                 <el-form-item label="学院:">
                                     <el-input v-model="form.instituteName" readonly></el-input>
@@ -71,7 +71,7 @@
                                 </el-form-item>
                             </div>
                         </el-col>
-                        <el-col :md="6" :xs="24" :sm="12">
+                        <el-col :md="9" :xs="24" :sm="12">
                             <div>
                                 <el-form-item label="班级:">
                                     <el-input v-model="form.className" readonly></el-input>
