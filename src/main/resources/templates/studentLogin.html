@@ -143,7 +143,11 @@
             };
         },
         methods: {
-
+            getCookie(name) {
+                var value = '; ' + document.cookie;
+                var parts = value.split('; ' + name + '=');
+                if (parts.length === 2) return parts.pop().split(';').shift()
+            },
             register: function () {
                 window.location.replace('studentRegister.html')
             },
@@ -152,11 +156,14 @@
             },
             submitForm: function (formName) {
                 let that = this;
+                console.log("document",document.cookie)
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
+
                         axios({
                             headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded'
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                                'X-CSRFToken': that.getCookie('XSRF-TOKEN')
                             },
                             transformRequest: [function (data) {
                                 let ret = ''
@@ -169,7 +176,7 @@
                             url: '/student/login',
                             data: {
                                 stuNo: that.ruleForm.stuNo,
-                                password: that.ruleForm.password,
+                                password: that.ruleForm.password
                             }
                         }).then(function (response) {
                             console.log(response.data);
@@ -179,9 +186,9 @@
                                     type: 'success'
                                 });
                                 if (response.data.submit === true)
-                                    window.location.replace('studentDetail.html');
+                                    window.location.replace('/student/studentDetail.html');
                                 else
-                                    window.location.replace('studentSubmit.html');
+                                    window.location.replace('/student/studentSubmit.html');
                             } else {
                                 app.$message.error('登陆失败');
                             }

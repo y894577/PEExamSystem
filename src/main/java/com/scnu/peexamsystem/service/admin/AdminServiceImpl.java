@@ -3,11 +3,19 @@ package com.scnu.peexamsystem.service.admin;
 import com.scnu.peexamsystem.dao.admin.AdminDao;
 import com.scnu.peexamsystem.entity.Admin;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -15,9 +23,22 @@ import java.util.Map;
  * version 1.0
  */
 @Service
-public class AdminServiceImpl implements AdminService {
+public class AdminServiceImpl implements AdminService, UserDetailsService {
     @Autowired
     AdminDao adminDao;
+
+
+    @Override
+    public UserDetails loadUserByUsername(String adminID) throws UsernameNotFoundException {
+        Admin admin = adminDao.findAdminByAdminID(adminID);
+        if (admin == null)
+            throw new UsernameNotFoundException("管理员不存在");
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority("ADMIN"));
+        User user = new User(admin.getAdminID(), admin.getPassword(), authorities);
+        return user;
+
+    }
 
     /**
      * 管理员登录
@@ -64,6 +85,5 @@ public class AdminServiceImpl implements AdminService {
 
         return map;
     }
-
 
 }

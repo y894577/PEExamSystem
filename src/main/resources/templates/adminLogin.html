@@ -145,6 +145,11 @@
             };
         },
         methods: {
+            getCookie(name) {
+                var value = '; ' + document.cookie;
+                var parts = value.split('; ' + name + '=');
+                if (parts.length === 2) return parts.pop().split(';').shift()
+            },
             login: function () {
                 window.location.replace('studentLogin.html')
             },
@@ -154,7 +159,8 @@
                     if (valid) {
                         axios({
                             headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded'
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                                'X-CSRFToken': that.getCookie('XSRF-TOKEN')
                             },
                             transformRequest: [function (data) {
                                 let ret = ''
@@ -176,7 +182,7 @@
                                     message: '登陆成功',
                                     type: 'success'
                                 });
-                                window.location.replace('adminLists.html');
+                                window.location.replace('/admin/adminLists.html');
                             } else {
                                 app.$message.error('登陆失败');
                             }

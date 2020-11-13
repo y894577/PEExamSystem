@@ -12,4 +12,6 @@ public interface AdminDao {
 
     Admin findAdminByAdminIDAndPassword(@Param("adminID") String adminID,
                                         @Param("password") String password);
+
+    Admin findAdminByAdminID(@Param("adminID") String adminID);
 }

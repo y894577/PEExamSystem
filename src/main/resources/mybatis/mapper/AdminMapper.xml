@@ -8,4 +8,7 @@
         select * from admin where admin_id = #{adminID} and password = #{password}
     </select>
 
+    <select id="findAdminByAdminID" resultType="Admin">
+        select * from admin where admin_id = #{adminID};
+    </select>
 </mapper>

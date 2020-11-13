@@ -8,11 +8,18 @@ import com.scnu.peexamsystem.entity.Student;
 import com.scnu.peexamsystem.util.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +29,7 @@ import java.util.Map;
  * @version 1.0
  */
 @Service
-public class StudentServiceImpl implements StudentService {
+public class StudentServiceImpl implements StudentService, UserDetailsService {
     @Autowired
     StudentDao studentDao;
 
@@ -31,18 +38,32 @@ public class StudentServiceImpl implements StudentService {
     @Value("${upload.file.size}")
     private int fileMaxSize;
 
+
+    @Override
+    public UserDetails loadUserByUsername(String stuNo) throws UsernameNotFoundException {
+        Student student = studentDao.findStudentByStuNo(stuNo);
+        if (student == null)
+            throw new UsernameNotFoundException("该学生不存在");
+
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority("STUDENT"));
+
+        return new User(student.getStuNo(), student.getPassword(), authorities);
+    }
+
     /**
      * 查询学生列表
-     * @param stuName 学生姓名
-     * @param instituteNo 学院号
-     * @param classNo 班级号
-     * @param grade 年级
-     * @param status 审核状态
+     *
+     * @param stuName       学生姓名
+     * @param instituteNo   学院号
+     * @param classNo       班级号
+     * @param grade         年级
+     * @param status        审核状态
      * @param currentPageNo 当前页标
-     * @param pageSize 每一页展示条目数
+     * @param pageSize      每一页展示条目数
      * @return msg 返回消息
-     *         code 状态码，1成功，0失败
-     *         result 查询列表
+     * code 状态码，1成功，0失败
+     * result 查询列表
      */
     @Override
     public Map<String, Object> queryStudentList(String stuName, String instituteNo, String classNo, String grade, String status,
@@ -77,10 +98,11 @@ public class StudentServiceImpl implements StudentService {
 
     /**
      * 通过学号查询单个学生
+     *
      * @param stuNo 学号
      * @return msg 返回消息
-     *         code 状态码，1成功，0失败
-     *         result 学生实体
+     * code 状态码，1成功，0失败
+     * result 学生实体
      */
     @Override
     public Map<String, Object> queryStudent(String stuNo) {
@@ -97,11 +119,12 @@ public class StudentServiceImpl implements StudentService {
 
     /**
      * 学生登录，通过stuNo和password查询是否存在该学生
-     * @param stuNo 学号
+     *
+     * @param stuNo    学号
      * @param password 密码
      * @return msg 返回消息
-     *         code 状态码，1成功，0失败
-     *         result boolean是否登录成功
+     * code 状态码，1成功，0失败
+     * result boolean是否登录成功
      */
     @Override
     public Map<String, Object> studentLogin(String stuNo, String password) {
@@ -121,10 +144,11 @@ public class StudentServiceImpl implements StudentService {
 
     /**
      * 学生注册
-     * @param stuNo 学号
+     *
+     * @param stuNo    学号
      * @param password 密码
      * @return msg 返回消息
-     *         code 1成功，0失败，-1已存在该用户
+     * code 1成功，0失败，-1已存在该用户
      */
     @Override
     public Map<String, Object> registerStudent(String stuNo, String password) {
@@ -150,11 +174,12 @@ public class StudentServiceImpl implements StudentService {
 
     /**
      * 学生退出登录
+     *
      * @param isRemoveSession 是否移除session
-     * @param stuNo 学号
+     * @param stuNo           学号
      * @return msg 返回消息
-     *         code 状态码，1成功，0失败
-     *         result 学号stuNo
+     * code 状态码，1成功，0失败
+     * result 学号stuNo
      */
     @Override
     public Map<String, Object> studentLogout(boolean isRemoveSession, String stuNo) {
@@ -171,11 +196,12 @@ public class StudentServiceImpl implements StudentService {
 
     /**
      * 学生提交申请
-     * @param student 学生实体
+     *
+     * @param student   学生实体
      * @param isSession 提交请求stuNo和session是否一致
      * @return msg 返回消息
-     *         code 状态码，1成功，0失败
-     *         result 学生实体
+     * code 状态码，1成功，0失败
+     * result 学生实体
      */
     @Override
     public Map<String, Object> submitApplication(Student student, boolean isSession) {
@@ -192,11 +218,12 @@ public class StudentServiceImpl implements StudentService {
 
     /**
      * 修改审核状态
+     *
      * @param status 审核状态
-     * @param stuNo 学号
+     * @param stuNo  学号
      * @return msg 返回消息
-     *         code 状态码，1成功，0失败
-     *         result stuNo 学号，status 审核状态
+     * code 状态码，1成功，0失败
+     * result stuNo 学号，status 审核状态
      */
     @Override
     public Map<String, Object> modifyStatus(String status, String stuNo) {
@@ -217,10 +244,11 @@ public class StudentServiceImpl implements StudentService {
 
     /**
      * 上传图片文件
-     * @param file 图片文件
+     *
+     * @param file  图片文件
      * @param stuNo 学号
      * @return msg 返回消息
-     *         code 状态码，1成功，0失败，-1格式大小有误
+     * code 状态码，1成功，0失败，-1格式大小有误
      */
     @Override
     public Map<String, Object> uploadImg(MultipartFile file, String stuNo) throws Exception {
@@ -254,6 +282,5 @@ public class StudentServiceImpl implements StudentService {
 
         return map;
     }
-
 
 }
