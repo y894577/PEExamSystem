@@ -185,7 +185,7 @@
                                     message: '登陆成功',
                                     type: 'success'
                                 });
-                                if (response.data.submit === true)
+                                if (response.data.result.authorities[0].authority === "STUDENT_IS_SUBMIT")
                                     window.location.replace('/student/studentDetail.html');
                                 else
                                     window.location.replace('/student/studentSubmit.html');

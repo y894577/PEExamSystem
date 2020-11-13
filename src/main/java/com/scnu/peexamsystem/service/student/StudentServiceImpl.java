@@ -46,7 +46,11 @@ public class StudentServiceImpl implements StudentService, UserDetailsService {
             throw new UsernameNotFoundException("该学生不存在");
 
         List<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority("STUDENT"));
+
+        if (student.getSubmitReason().isEmpty())
+            authorities.add(new SimpleGrantedAuthority("STUDENT_NOT_SUBMIT"));
+        else
+            authorities.add(new SimpleGrantedAuthority("STUDENT_IS_SUBMIT"));
 
         return new User(student.getStuNo(), student.getPassword(), authorities);
     }

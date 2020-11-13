@@ -3,20 +3,22 @@ package com.scnu.peexamsystem.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.web.servlet.config.annotation.*;
 
 @Configuration
+@Order(1)
 public class MainConfiguration implements WebMvcConfigurer {
     @Value("${upload.file.path}")
     private String filePath;
 
-//    @Override
-//    public void addInterceptors(InterceptorRegistry registry) {
-//        InterceptorRegistration loginRegistration = registry.addInterceptor(new LoginHandlerInterception());
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        InterceptorRegistration loginRegistration = registry.addInterceptor(new LoginHandlerInterception());
 //        InterceptorRegistration studentRegistration = registry.addInterceptor(new StudentHandlerInterception());
 //        InterceptorRegistration adminRegistration = registry.addInterceptor(new AdminHandlerInterception());
-//
-//        loginRegistration.addPathPatterns("/**");
+
+        loginRegistration.addPathPatterns("/**");
 //        loginRegistration.excludePathPatterns("/error/*")
 //                .excludePathPatterns("/js/axios.min.js")
 //                .excludePathPatterns("/**/*.js")
@@ -44,7 +46,7 @@ public class MainConfiguration implements WebMvcConfigurer {
 //                .excludePathPatterns("/admin/logout")
 //                .excludePathPatterns("/student/uploadFile/**")
 //                .excludePathPatterns("/js/axios.min.js");
-//    }
+    }
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {

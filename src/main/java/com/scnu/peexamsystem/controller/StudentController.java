@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
 import java.io.File;
+import java.security.Principal;
 import java.util.Map;
 
 /**
@@ -28,12 +29,12 @@ public class StudentController {
 
     /**
      * 通过session获取StuNo
-     * @param session session
-     * @return session里储存的StuNo
+     * @param principal principal
+     * @return stuNo
      */
     @GetMapping("/getStuNo")
-    private String getStuNo(HttpSession session) {
-        return session.getAttribute(ConstantUtil.USER_SESSION_KEY).toString();
+    private String getStuNo(Principal principal) {
+        return principal.getName();
     }
 
     /**

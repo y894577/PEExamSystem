@@ -27,15 +27,16 @@ public class LoginHandlerInterception implements HandlerInterceptor {
             response.sendRedirect("/error/500.html");
             return false;
         }
+        return true;
 
-        Object user = request.getSession().getAttribute(ConstantUtil.USER_SESSION_KEY);
-        Object admin = request.getSession().getAttribute(ConstantUtil.ADMIN_SESSION_KEY);
-        if (user == null && admin == null) {
-            response.sendRedirect("/studentLogin.html");
-            return false;
-        } else {
-            return true;
-        }
+//        Object user = request.getSession().getAttribute(ConstantUtil.USER_SESSION_KEY);
+//        Object admin = request.getSession().getAttribute(ConstantUtil.ADMIN_SESSION_KEY);
+//        if (user == null && admin == null) {
+//            response.sendRedirect("/studentLogin.html");
+//            return false;
+//        } else {
+//            return true;
+//        }
 
     }
 
