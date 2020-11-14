@@ -19,10 +19,10 @@ public interface StudentService {
 
     Map<String, Object> registerStudent(String stuNo, String password);
 
-    Map<String, Object> studentLogout(boolean isRemoveSession, String stuNo);
+    Map<String, Object> studentLogout(String stuNo);
 
     @PreAuthorize("hasAnyAuthority('STUDENT_NOT_SUBMIT')")
-    Map<String, Object> submitApplication(Student student, boolean isSession);
+    Map<String, Object> submitApplication(Student student);
 
     @PreAuthorize("hasAnyAuthority('ADMIN')")
     Map<String, Object> modifyStatus(String status, String stuNo);

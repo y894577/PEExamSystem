@@ -58,7 +58,7 @@
         where stu_no = #{stuNo}
     </update>
 
-    <select id="findStudentByStuNo" resultType="Student">
+    <select id="findStudentDetailByStuNo" resultType="Student">
         select stu.*, ins.institute_name, cla.class_name, cla.grade
         from student as stu, institute as ins, class as cla
          where stu.stu_no = #{stuNo}
@@ -70,5 +70,9 @@
     <update id="updateStudentVerifyStatus">
         update student set verify_status = #{status} where stu_no = #{stuNo};
     </update>
+
+    <select id="findStudentByStuNo" resultType="Student">
+        select * from student where stu_no = #{stuNo}
+    </select>
 
 </mapper>

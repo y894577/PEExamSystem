@@ -3,8 +3,11 @@ package com.scnu.peexamsystem.service.admin;
 import com.scnu.peexamsystem.dao.admin.AdminDao;
 import com.scnu.peexamsystem.entity.Admin;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -20,7 +23,7 @@ import java.util.Map;
 
 /**
  * @author Magic Gunner
- * version 1.0
+ * version 2.0
  */
 @Service
 public class AdminServiceImpl implements AdminService, UserDetailsService {
@@ -28,6 +31,12 @@ public class AdminServiceImpl implements AdminService, UserDetailsService {
     AdminDao adminDao;
 
 
+    /**
+     * 2.0——管理员登录
+     * @param adminID 管理员id
+     * @return 带授权的管理员信息
+     * @throws UsernameNotFoundException 该管理员不存在
+     */
     @Override
     public UserDetails loadUserByUsername(String adminID) throws UsernameNotFoundException {
         Admin admin = adminDao.findAdminByAdminID(adminID);
@@ -35,12 +44,11 @@ public class AdminServiceImpl implements AdminService, UserDetailsService {
             throw new UsernameNotFoundException("管理员不存在");
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority("ADMIN"));
-        User user = new User(admin.getAdminID(), admin.getPassword(), authorities);
-        return user;
-
+        return new User(admin.getAdminID(), admin.getPassword(), authorities);
     }
 
     /**
+     * @deprecated 2.0版本已不再使用
      * 管理员登录
      * @param adminID 管理员id
      * @param password 密码
@@ -76,6 +84,11 @@ public class AdminServiceImpl implements AdminService, UserDetailsService {
     @Override
     public Map<String, Object> adminLogout(String adminID) {
         Map<String, Object> map = new HashMap<>();
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        List<GrantedAuthority> authList = new ArrayList<>();
+        Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), authList);
+        SecurityContextHolder.getContext().setAuthentication(newAuth);
 
         map.put("msg", "退出登录成功");
         Map<String, Object> result = new HashMap<>();

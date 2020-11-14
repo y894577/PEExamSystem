@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * @author Magic Gunner
  * @version 1.0
+ * @deprecated 1.0基于WebMvcConfigurer，2.0基于WebSecurityConfigurerAdapter
  */
 public class StudentHandlerInterception implements HandlerInterceptor {
     /**

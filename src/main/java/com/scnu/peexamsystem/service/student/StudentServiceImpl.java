@@ -8,8 +8,11 @@ import com.scnu.peexamsystem.entity.Student;
 import com.scnu.peexamsystem.util.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -26,7 +29,7 @@ import java.util.Map;
 
 /**
  * @author Magic Gunner
- * @version 1.0
+ * @version 2.0
  */
 @Service
 public class StudentServiceImpl implements StudentService, UserDetailsService {
@@ -39,6 +42,13 @@ public class StudentServiceImpl implements StudentService, UserDetailsService {
     private int fileMaxSize;
 
 
+    /**
+     * 2.0版本——学生登录
+     *
+     * @param stuNo 学号
+     * @return 带授权的用户信息
+     * @throws UsernameNotFoundException 该学生不存在
+     */
     @Override
     public UserDetails loadUserByUsername(String stuNo) throws UsernameNotFoundException {
         Student student = studentDao.findStudentByStuNo(stuNo);
@@ -47,7 +57,7 @@ public class StudentServiceImpl implements StudentService, UserDetailsService {
 
         List<GrantedAuthority> authorities = new ArrayList<>();
 
-        if (student.getSubmitReason().isEmpty())
+        if (StringUtils.isEmpty(student.getSubmitReason()))
             authorities.add(new SimpleGrantedAuthority("STUDENT_NOT_SUBMIT"));
         else
             authorities.add(new SimpleGrantedAuthority("STUDENT_IS_SUBMIT"));
@@ -68,6 +78,7 @@ public class StudentServiceImpl implements StudentService, UserDetailsService {
      * @return msg 返回消息
      * code 状态码，1成功，0失败
      * result 查询列表
+     *
      */
     @Override
     public Map<String, Object> queryStudentList(String stuName, String instituteNo, String classNo, String grade, String status,
@@ -112,7 +123,7 @@ public class StudentServiceImpl implements StudentService, UserDetailsService {
     public Map<String, Object> queryStudent(String stuNo) {
         Map<String, Object> map = new HashMap<>();
 
-        Student student = studentDao.findStudentByStuNo(stuNo);
+        Student student = studentDao.findStudentDetailByStuNo(stuNo);
         boolean isQuery = student != null;
         map.put("msg", "查询" + (isQuery ? "成功" : "失败"));
         map.put("result", student);
@@ -122,6 +133,7 @@ public class StudentServiceImpl implements StudentService, UserDetailsService {
     }
 
     /**
+     * @deprecated 2.0版本继承UserDetailsService，不再使用该接口
      * 学生登录，通过stuNo和password查询是否存在该学生
      *
      * @param stuNo    学号
@@ -179,21 +191,25 @@ public class StudentServiceImpl implements StudentService, UserDetailsService {
     /**
      * 学生退出登录
      *
-     * @param isRemoveSession 是否移除session
      * @param stuNo           学号
      * @return msg 返回消息
      * code 状态码，1成功，0失败
      * result 学号stuNo
      */
     @Override
-    public Map<String, Object> studentLogout(boolean isRemoveSession, String stuNo) {
+    public Map<String, Object> studentLogout(String stuNo) {
         Map<String, Object> map = new HashMap<>();
 
-        map.put("msg", "退出登录" + (isRemoveSession ? "成功" : "失败"));
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        List<GrantedAuthority> authList = new ArrayList<>();
+        Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), authList);
+        SecurityContextHolder.getContext().setAuthentication(newAuth);
+
+        map.put("msg", "退出登录成功");
         Map<String, Object> result = new HashMap<>();
         result.put("stuNo", stuNo);
         map.put("result", result);
-        map.put("code", isRemoveSession ? 1 : 0);
+        map.put("code", 1);
 
         return map;
     }
@@ -202,18 +218,17 @@ public class StudentServiceImpl implements StudentService, UserDetailsService {
      * 学生提交申请
      *
      * @param student   学生实体
-     * @param isSession 提交请求stuNo和session是否一致
      * @return msg 返回消息
      * code 状态码，1成功，0失败
      * result 学生实体
      */
     @Override
-    public Map<String, Object> submitApplication(Student student, boolean isSession) {
+    public Map<String, Object> submitApplication(Student student) {
         Map<String, Object> map = new HashMap<>();
 
-        boolean isUpdate = isSession && studentDao.updateStudent(student) > 0;
+        boolean isUpdate = studentDao.updateStudent(student) > 0;
 
-        map.put("msg", "提交申请" + (isUpdate && isSession ? "成功" : "失败"));
+        map.put("msg", "提交申请" + (isUpdate? "成功" : "失败"));
         map.put("result", student);
         map.put("code", isUpdate ? 1 : 0);
 

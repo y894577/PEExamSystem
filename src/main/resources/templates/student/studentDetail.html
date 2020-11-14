@@ -166,9 +166,10 @@
                     method: 'post',
                     url: '/student/logout',
                 }).then(function (response) {
+                    console.log(response.data)
                     if (response.data.code === 1) {
                         alert(response.data.msg);
-                        location.reload();
+                        location.replace("/studentLogin.html");
                     } else {
                         alert(response.data.msg);
                     }

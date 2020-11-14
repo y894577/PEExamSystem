@@ -21,32 +21,81 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
+    @SuppressWarnings("deprecation")
+    @Bean
+    public static PasswordEncoder passwordEncoder() {
+        return new MessageDigestPasswordEncoder("MD5");
+    }
 
     @Configuration
-    @Order(2)
-    static class StudentSecurityConfig extends WebSecurityConfigurerAdapter {
-        @Autowired
-        private StudentServiceImpl studentService;
-
-        @Bean
-        public PasswordEncoder passwordEncoder() {
-            return new MessageDigestPasswordEncoder("MD5");
+    @Order(4)
+    static class MainSecurityConfig extends WebSecurityConfigurerAdapter{
+        @Override
+        public void configure(WebSecurity web) throws Exception {
+            web.ignoring().antMatchers("/error/**", "/static/**", "/**/**.js", "/js/**", "/**/**.css", "/*Register.html", "/*Login.html");
         }
 
         @Override
-        public void configure(WebSecurity web) throws Exception {
-            web.ignoring().antMatchers("/error/**", "/static/**", "/**/**.js", "/js/**", "/**/**.css", "/*Register.html");
+        protected void configure(HttpSecurity http) throws Exception {
+            http.csrf().ignoringAntMatchers("/*/logout");
+            http.authorizeRequests()
+                    .antMatchers("/admin/**").hasAuthority("ADMIN")
+                    .antMatchers("/student/studentDetail.html").hasAuthority("STUDENT_IS_SUBMIT")
+                    .antMatchers("/student/studentSubmit.html").hasAuthority("STUDENT_NOT_SUBMIT")
+                    .anyRequest().authenticated();
         }
+    }
+
+    @Configuration
+    @Order(2)
+    static class AdminSecurityConfig extends WebSecurityConfigurerAdapter {
+        @Autowired
+        private AdminServiceImpl adminService;
 
         @Override
         protected void configure(HttpSecurity http) throws Exception {
             http.headers().frameOptions().disable();
             http.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
 
-            http.authorizeRequests().antMatchers("/student/login", "/institute/**", "/class/**").permitAll()
-                    .antMatchers("/student/studentDetail.html").hasAuthority("STUDENT_IS_SUBMIT")
-                    .antMatchers("/student/studentSubmit.html").hasAuthority("STUDENT_NOT_SUBMIT")
-                    .anyRequest().authenticated();
+            http.antMatcher("/admin/login").authorizeRequests();
+
+
+            http.formLogin().
+                    loginPage("/adminLogin.html")
+                    .loginProcessingUrl("/admin/login")
+                    .usernameParameter("adminID")
+                    .successHandler(new LoginHandler.LoginSuccessHandler())
+                    .failureHandler(new LoginHandler.LoginFailureHandler())
+                    .permitAll();
+
+
+            http.formLogin().and()
+                    .logout()
+                    .logoutUrl("/admin/logout")
+                    .logoutSuccessHandler(new LoginHandler.LogoutHandler())
+                    .logoutSuccessUrl("/adminLogin.html")
+                    .permitAll();
+        }
+
+        @Override
+        protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+            auth.userDetailsService(adminService)
+                    .passwordEncoder(passwordEncoder());
+        }
+    }
+
+    @Configuration
+    @Order(3)
+    static class StudentSecurityConfig extends WebSecurityConfigurerAdapter {
+        @Autowired
+        private StudentServiceImpl studentService;
+
+        @Override
+        protected void configure(HttpSecurity http) throws Exception {
+            http.headers().frameOptions().disable();
+            http.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
+
+            http.antMatcher("/student/login").authorizeRequests();
 
             http.formLogin().
                     loginPage("/studentLogin.html")
@@ -63,61 +112,11 @@ public class SecurityConfig {
                     .logoutSuccessHandler(new LoginHandler.LogoutHandler())
                     .logoutSuccessUrl("/studentLogin.html")
                     .permitAll();
-
         }
 
         @Override
         protected void configure(AuthenticationManagerBuilder auth) throws Exception {
             auth.userDetailsService(studentService)
-                    .passwordEncoder(passwordEncoder());
-        }
-    }
-
-    @Configuration
-    @Order(3)
-    static class AdminSecurityConfig extends WebSecurityConfigurerAdapter {
-        @Autowired
-        private AdminServiceImpl adminService;
-
-        @Bean
-        public PasswordEncoder passwordEncoder() {
-            return new MessageDigestPasswordEncoder("MD5");
-        }
-
-        @Override
-        public void configure(WebSecurity web) throws Exception {
-            web.ignoring().antMatchers("/error/**", "/static/**", "/**/**.js", "/js/**", "/**/**.css", "/*Register.html");
-        }
-
-        @Override
-        protected void configure(HttpSecurity http) throws Exception {
-            http.headers().frameOptions().disable();
-            http.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
-
-            http.authorizeRequests().antMatchers("/admin/login").permitAll()
-                    .antMatchers("/admin/**").hasAuthority("ADMIN");
-
-            http.formLogin().
-                    loginPage("/adminLogin.html")
-                    .loginProcessingUrl("/admin/login")
-                    .usernameParameter("adminID")
-                    .successHandler(new LoginHandler.LoginSuccessHandler())
-                    .failureHandler(new LoginHandler.LoginFailureHandler())
-                    .permitAll();
-
-
-            http.formLogin().and()
-                    .logout()
-                    .logoutUrl("/admin/logout")
-                    .logoutSuccessHandler(new LoginHandler.LogoutHandler())
-                    .logoutSuccessUrl("/admin/adminLogin.html")
-                    .permitAll();
-
-        }
-
-        @Override
-        protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-            auth.userDetailsService(adminService)
                     .passwordEncoder(passwordEncoder());
         }
     }
