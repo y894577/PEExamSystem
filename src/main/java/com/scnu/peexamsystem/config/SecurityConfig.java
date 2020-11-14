@@ -37,7 +37,9 @@ public class SecurityConfig {
 
         @Override
         protected void configure(HttpSecurity http) throws Exception {
-            http.csrf().ignoringAntMatchers("/*/logout");
+            http.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
+
+//            http.csrf().ignoringAntMatchers("/*/logout");
             http.authorizeRequests()
                     .antMatchers("/admin/**").hasAuthority("ADMIN")
                     .antMatchers("/student/studentDetail.html").hasAuthority("STUDENT_IS_SUBMIT")
