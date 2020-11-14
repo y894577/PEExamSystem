@@ -177,7 +177,7 @@
                 }).then(function (response) {
                     if (response.data.code === 1) {
                         alert(response.data.msg);
-                        location.reload();
+                        location.replace("/adminLogin.html");
                     } else {
                         alert(response.data.msg);
                     }

@@ -29,7 +29,7 @@ public class SecurityConfig {
 
     @Configuration
     @Order(4)
-    static class MainSecurityConfig extends WebSecurityConfigurerAdapter{
+    static class MainSecurityConfig extends WebSecurityConfigurerAdapter {
         @Override
         public void configure(WebSecurity web) throws Exception {
             web.ignoring().antMatchers("/error/**", "/static/**", "/**/**.js", "/js/**", "/**/**.css", "/*Register.html", "/*Login.html");
@@ -39,8 +39,8 @@ public class SecurityConfig {
         protected void configure(HttpSecurity http) throws Exception {
             http.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
 
-//            http.csrf().ignoringAntMatchers("/*/logout");
             http.authorizeRequests()
+                    .antMatchers("/institute/**", "/class/**").permitAll()
                     .antMatchers("/admin/**").hasAuthority("ADMIN")
                     .antMatchers("/student/studentDetail.html").hasAuthority("STUDENT_IS_SUBMIT")
                     .antMatchers("/student/studentSubmit.html").hasAuthority("STUDENT_NOT_SUBMIT")
